@@ -12,8 +12,12 @@
 hs_err_pid*
 
 # Netbeans directories
-/buil/
+/build/
 /dist/
 /nbproject/
 /build.xml
 /manifest.mf
+/build/built-jar.properties
+
+#Archivos del sistema
+*~

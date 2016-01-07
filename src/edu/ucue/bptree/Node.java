@@ -15,8 +15,6 @@ public final class Node<K> {
     private K[] keys; // Claves
     private Object[] values; // Valores
     private final int keysNumber; // Número máximo de claves
-    //private Node next; // Nodo siguiente
-    //private Node prev; // Nodo anterior
 
     public Node(boolean leaf, Node next, int keysNumber) {
         this.leaf = leaf;
@@ -25,8 +23,6 @@ public final class Node<K> {
         this.keys = (K[]) new Object[this.keysNumber];
         this.values = new Object[this.keysNumber + 1];
         setNext(next);
-        //this.next = next;
-        //this.prev = prev;
     }
     
     /**
@@ -39,5 +35,25 @@ public final class Node<K> {
     
     public void setNext(Node node){
         values[keysNumber] = node;
+    }
+    
+    public Object getValue(int index){
+        return values[index];
+    }
+    
+    public K getKey(int index){
+        return keys[index];
+    }
+
+    public int getNodeSize() {
+        return nodeSize;
+    }
+
+    public boolean isLeaf() {
+        return leaf;
+    }
+
+    public void setLeaf(boolean leaf) {
+        this.leaf = leaf;
     }
 }

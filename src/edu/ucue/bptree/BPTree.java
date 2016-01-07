@@ -14,6 +14,8 @@ public class BPTree {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Tree<Integer> tree = new Tree(2);
+        tree.toString();
     }
     
 }
