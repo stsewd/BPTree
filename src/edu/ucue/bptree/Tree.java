@@ -17,6 +17,6 @@ public class Tree<K> {
      */
     public Tree(int KeysNumber) {
         this.keysNumber = KeysNumber;
-        this.root = new Node(true, null, null, keysNumber);
+        this.root = new Node(true, null, keysNumber);
     }
 }
