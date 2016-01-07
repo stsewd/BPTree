@@ -8,15 +8,17 @@ import java.util.Comparator;
 /**
  *
  * @author Santos Gallegos
- * @param <K>
+ * @param <K> Clave
+ * @param <V> Valor
  */
-public final class Node<K> {
+public final class Node<K, V> {
     private boolean leaf; // Hoja
     
     private int nodeSize; // Tamaño actual del nodo
+    private Node next;
     
     private final K[] keys; // Claves
-    private final Object[] values; // Valores
+    private final V[] values; // Valores
     private final int keysNumber; // Número máximo de claves
     private final Comparator<K> comparator;
 
@@ -25,7 +27,7 @@ public final class Node<K> {
         this.nodeSize = 0;
         this.keysNumber = keysNumber;
         this.keys = (K[]) new Object[this.keysNumber];
-        this.values = new Object[this.keysNumber + 1];
+        this.values = (V[]) new Object[this.keysNumber + 1];
         this.comparator = comparator;
     }
     
@@ -34,11 +36,11 @@ public final class Node<K> {
      * @return 
      */
     public Node next(){
-        return (Node) values[keysNumber];
+        return next;
     }
     
     public void setNext(Node node){
-        values[keysNumber] = node;
+        this.next = node;
     }
     
     public Object getValue(int index){
@@ -69,7 +71,7 @@ public final class Node<K> {
         this.leaf = leaf;
     }
    
-    public void insert(K key, Object value){
+    public void insert(K key, V value){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];

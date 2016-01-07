@@ -14,11 +14,15 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        BPTree<Integer> tree = new BPTree(2, new ComparatorInt());
+        BPTree<String, Integer> tree = new BPTree(4, new ComparatorString());
         System.out.println(tree.toString());
-        tree.add(2, 2);
+        tree.add("Z", 1);
         System.out.println(tree.toString());
-        tree.add(3, 3);
+        tree.add("B", 2);
+        System.out.println(tree.toString());
+        tree.add("D", 2);
+        System.out.println(tree.toString());
+        tree.add("A", 2);
         System.out.println(tree.toString());
     }
     

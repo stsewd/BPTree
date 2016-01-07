@@ -8,16 +8,17 @@ import java.util.Comparator;
 /**
  *
  * @author Santos Gallegos
- * @param <K>
+ * @param <K> Clave
+ * @param <V> Valor
  */
-public class BPTree<K> {
-    private Node<K> root; // Nodo raíz
+public class BPTree<K, V> {
+    private Node<K, V> root; // Nodo raíz
     private final int keysNumber; // Número máximo de claves
-    private final Comparator<K> comparator;
+    private final Comparator<K> comparator; // Objeto que provee el método para comparar las claves
     /**
      * Crea un nuevo árbol vacío.
-     * @param KeysNumber 
-     * @param comparator 
+     * @param KeysNumber Número máximo de claves.
+     * @param comparator Objeto necesario para comparar las claves.
      */
     public BPTree(int KeysNumber, Comparator<K> comparator) {
         this.keysNumber = KeysNumber;
@@ -36,7 +37,7 @@ public class BPTree<K> {
         }
     }
 
-    public Node<K> getRoot() {
+    public Node<K, V> getRoot() {
         return root;
     }
 
@@ -64,5 +65,12 @@ public class BPTree<K> {
         if(node.isLeaf()){
             node.insert(key, value);
         }
+    }
+
+    /**
+     * @return the comparator
+     */
+    public Comparator<K> getComparator() {
+        return comparator;
     }
 }
