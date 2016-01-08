@@ -15,21 +15,23 @@ public final class Node<K, V> {
     private boolean leaf; // Hoja
     
     private int nodeSize; // Tamaño actual del nodo
+    private Node parent;
     private Node next;
     
     private final K[] keys; // Claves
     private final Node[] children; // hijos
     private final V[] values; // Valores
+    
     private final int keysNumber; // Número máximo de claves
-    private final Comparator<K> comparator;
+    private final Comparator<K> comparator; // Comparador de claves
 
     public Node(boolean leaf, int keysNumber, Comparator<K> comparator) {
         this.leaf = leaf;
         this.nodeSize = 0;
         this.keysNumber = keysNumber;
-        this.keys = (K[]) new Object[this.keysNumber];
+        this.keys = (K[]) new Object[this.keysNumber + 1];
         this.children = new Node[this.keysNumber + 1];
-        this.values = (V[]) new Object[this.keysNumber];
+        this.values = (V[]) new Object[this.keysNumber + 1];
         this.comparator = comparator;
     }
     
@@ -95,5 +97,19 @@ public final class Node<K, V> {
         keys[i + 1] = key;
         values[i + 1] = value;
         nodeSize++;
+    }
+
+    /**
+     * @return the parent
+     */
+    public Node getParent() {
+        return parent;
+    }
+
+    /**
+     * @param parent the parent to set
+     */
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
 }

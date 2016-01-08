@@ -26,20 +26,27 @@ public class BPTree<K, V> {
         this.root = new Node<>(true, keysNumber, comparator);
     }
     
+    public V search(K key){
+        return search(key, root);
+    }
+    
+    private V search(K key, Node node){
+        if(node.isLeaf()){
+            for(int i = 0; i < node.getNodeSize(); i++){
+                if(comparator.compare(key, (K) node.getKey(i)) == 0)
+                    return (V) node.getValue(i);
+            }
+        }else {
+            int i = 0;
+            while(i <  node.getNodeSize() && comparator.compare(key, (K) node.getKey(i)) >= 0)
+                i++;
+            return search(key, node.getChild(i));
+        }
+        return null;
+    }
+    
     public void add(K key, V value){
         add(key, value, root);
-        /*
-        Node tmpRoot = root;
-        
-        // Comprobar si la raíz está llena
-        if(root.getNodeSize() == keysNumber){
-            //Ubicar nueva clave
-            //Dividir nodo izq, medio, der
-            //Crear nuevo nodo con clave medio
-        }else {
-            insert(root, key, value);
-        }
-        */
     }
     
     private void add(K key, V value, Node node){
@@ -47,22 +54,43 @@ public class BPTree<K, V> {
         int i;
         while(!leaf.isLeaf()){
             i = 0;
-            while(i <  node.getNodeSize() && comparator.compare(key, (K) node.getKey(i)) >= 0){
+            while(i <  node.getNodeSize() && comparator.compare(key, (K) node.getKey(i)) >= 0)
                 i++;
-            }
             leaf = leaf.getChild(i);
         }
         if(leaf.getNodeSize() == keysNumber){
-            
+            Node newLeaf = new Node(true, keysNumber, comparator);
+            if(leaf.getParent() == null){
+                leaf.insert(key, value);
+                
+                root = new Node(false, keysNumber, comparator);
+                leaf.setParent(root);
+                newLeaf.setParent(root);
+                
+                // Dividir claves/valores del nodo hoja
+                int k = 0;
+                for(int j = keysNumber/2; j < keysNumber + 1; j++){
+                    newLeaf.setKey(k, leaf.getKey(j));
+                    newLeaf.setValue(k, leaf.getValue(j));
+                    k++;
+                }
+                
+                leaf.setNodeSize((keysNumber)/2);
+                newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
+                
+                root.setKey(0, (K) newLeaf.getKey(0));
+                root.setNodeSize(1);
+                
+                root.setChild(0, leaf);
+                root.setChild(1, newLeaf);
+            }
         }else {
             leaf.insert(key, value);
         }
     }
     
-    public Node<K, V> getRoot() {
-        return root;
-    }
-
+    
+    /*
     private void insert(Node node, K key, V value) {
         int i = node.getNodeSize() - 1;
         if(node.isLeaf()){
@@ -78,28 +106,13 @@ public class BPTree<K, V> {
         }else {
         }
     }
+    */
     
     private void split() {
     }
     
-    public V search(K key){
-        return search(key, root);
-    }
-    
-    private V search(K key, Node node){
-        if(node.isLeaf()){
-            for(int i = 0; i < node.getNodeSize(); i++){
-                if(comparator.compare(key, (K) node.getKey(i)) == 0)
-                    return (V) node.getValue(i);
-            }
-        }else {
-            int i = 0;
-            while(i <  node.getNodeSize() && comparator.compare(key, (K) node.getKey(i)) >= 0){
-                i++;
-            }
-            return search(key, node.getChild(i));
-        }
-        return null;
+    public Node<K, V> getRoot() {
+        return root;
     }
 
     /**
@@ -116,14 +129,20 @@ public class BPTree<K, V> {
     }
     
     private String toString(Node node, int index){
-        if(index >= node.getNodeSize()){
+        if(index >= node.getNodeSize() && node.isLeaf()){
             return "\n";
         }
+        
+        if(index >= node.getNodeSize() + 1){
+            return "\n";
+        }
+        
         String str = "";
-        str += node.getKey(index) + " ";
+        if(index < node.getNodeSize())
+            str += node.getKey(index) + " ";
         
         if(!node.isLeaf())
-            str += toString((Node) node.getValue(index), 0);
+            str += toString((Node) node.getChild(index), 0);
         str += toString(node, index + 1);
         return str;
     }
