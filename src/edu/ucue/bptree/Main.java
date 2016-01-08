@@ -20,8 +20,10 @@ public class Main {
         System.out.println(tree.toString());
         tree.add("B", 2);
         System.out.println(tree.toString());
-        tree.add("D", 2);
+        
+        tree.add("C", 2);
         System.out.println(tree.toString());
+        
         tree.add("A", 2);
         System.out.println(tree.toString());
     }

@@ -18,6 +18,7 @@ public final class Node<K, V> {
     private Node next;
     
     private final K[] keys; // Claves
+    private final Node[] children; // hijos
     private final V[] values; // Valores
     private final int keysNumber; // Número máximo de claves
     private final Comparator<K> comparator;
@@ -27,7 +28,8 @@ public final class Node<K, V> {
         this.nodeSize = 0;
         this.keysNumber = keysNumber;
         this.keys = (K[]) new Object[this.keysNumber];
-        this.values = (V[]) new Object[this.keysNumber + 1];
+        this.children = new Node[this.keysNumber + 1];
+        this.values = (V[]) new Object[this.keysNumber];
         this.comparator = comparator;
     }
     
@@ -42,21 +44,33 @@ public final class Node<K, V> {
     public void setNext(Node node){
         this.next = node;
     }
+
+    public void setNodeSize(int nodeSize) {
+        this.nodeSize = nodeSize;
+    }
     
-    public Object getValue(int index){
+    public V getValue(int index){
         return values[index];
     }
 
-    public Object[] getValues() {
-        return values;
+    public void setValue(int index, V value){
+        values[index] = value;
     }
     
     public K getKey(int index){
         return keys[index];
     }
-
-    public K[] getKeys() {
-        return keys;
+    
+    public void setKey(int index, K key){
+        keys[index] = key;
+    }
+    
+    public Node getChild(int index){
+        return children[index];
+    }
+    
+    public void setChild(int index, Node child){
+        children[index] = child;
     }
 
     public int getNodeSize() {
