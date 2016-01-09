@@ -63,6 +63,7 @@ public class BPTree<K, V> {
     }
     
     private void add(K key, V value, Node node){
+        // Buscar en qué hoja pertenece la clave a insertar
         Node leaf = node;
         int i;
         while(!leaf.isLeaf()){
@@ -71,6 +72,7 @@ public class BPTree<K, V> {
                 i++;
             leaf = leaf.getChild(i);
         }
+        
         if(leaf.getNodeSize() == keysNumber){
             Node newLeaf = new Node(true, keysNumber, comparator);
             // Si el padre del nodo es nulo (solo hay un nodo hoja/root)
@@ -83,7 +85,7 @@ public class BPTree<K, V> {
                 
                 // Dividir claves/valores del nodo hoja
                 int k = 0;
-                for(int j = keysNumber/2; j < keysNumber + 1; j++){
+                for(int j = (keysNumber)/2; j < keysNumber + 1; j++){
                     newLeaf.setKey(k, leaf.getKey(j));
                     newLeaf.setValue(k, leaf.getValue(j));
                     k++;
@@ -101,7 +103,7 @@ public class BPTree<K, V> {
                 leaf.insert(key, value);
                 // Dividir claves/valores del nodo hoja
                 int k = 0;
-                for(int j = keysNumber/2; j < keysNumber + 1; j++){
+                for(int j = (keysNumber)/2; j < keysNumber + 1; j++){
                     newLeaf.setKey(k, leaf.getKey(j));
                     newLeaf.setValue(k, leaf.getValue(j));
                     k++;
@@ -115,13 +117,68 @@ public class BPTree<K, V> {
                 
                 parent.insert(newLeaf.getKey(0), newLeaf);
                 
+                if(parent.getNodeSize() > keysNumber){
+                    splitInnerNode(parent);
+                }
             }
         }else {
             leaf.insert(key, value);
         }
     }
     
-    private void split() {
+    private void splitInnerNode(Node node) {
+        Node newNode = new Node(false, keysNumber, comparator);
+        
+        if(node.getParent() == null){           
+            root = new Node(false, keysNumber, comparator);
+            node.setParent(root);
+            newNode.setParent(root);
+
+            // Dividir claves/valores del nodo interno
+            int k = 0;
+            int j;
+            for(j = (keysNumber)/2 + 1; j < keysNumber + 1; j++){
+                newNode.setKey(k, node.getKey(j));
+                newNode.setChild(k, node.getChild(j));
+                node.getChild(j).setParent(newNode);
+                k++;
+            }
+            newNode.setChild(k, node.getChild(j));
+            node.getChild(j).setParent(newNode);
+            
+            
+            node.setNodeSize((keysNumber)/2);
+            newNode.setNodeSize(keysNumber - (keysNumber)/2);
+            
+            root.setKey(0, (K) node.getKey((keysNumber)/2));
+            root.setNodeSize(1);
+            
+            // Set nuevos padres
+
+            
+            root.setChild(0, node);
+            root.setChild(1, newNode);
+            return;
+        }
+        
+        int k = 0;
+        int j;
+        for(j = (keysNumber)/2 + 1; j < keysNumber + 1; j++){
+            newNode.setKey(k, node.getKey(j));
+            newNode.setChild(k, node.getChild(j));
+            k++;
+        }
+        newNode.setChild(k, node.getChild(j));
+        
+        node.setNodeSize((keysNumber)/2);
+        newNode.setNodeSize(keysNumber - (keysNumber)/2);
+        
+        Node parent = node.getParent();
+        newNode.setParent(parent);
+        
+        parent.insert(node.getKey((keysNumber)/2), newNode);
+        if(parent.getNodeSize() == keysNumber)
+            splitInnerNode(parent);
     }
     
     /**
@@ -142,8 +199,7 @@ public class BPTree<K, V> {
 
     @Override
     public String toString() {
-        String str = "";
-        return toString(root, 0);
+        return toString(root);
     }
     
     /**
@@ -152,12 +208,22 @@ public class BPTree<K, V> {
      * @param index
      * @return 
      */
-    private String toString(Node node, int index){
-        if(index >= node.getNodeSize() && node.isLeaf()){
-            return "\n";
-        }
+    private String toString(Node node){
+        String str = "";
+        str += node.toString() + "\n";
         
-        if(index >= node.getNodeSize() + 1){
+        if(node.isLeaf())
+            return str;
+        
+        for(int i = 0; i < node.getNodeSize() + 1; i++)
+            str += toString(node.getChild(i));
+        
+        return str;
+        
+        /*
+        if((index >= node.getNodeSize() && node.isLeaf()) ||
+                (index >= node.getNodeSize() + 1))
+        {
             return "\n";
         }
         
@@ -169,5 +235,6 @@ public class BPTree<K, V> {
             str += toString((Node) node.getChild(index), 0);
         str += toString(node, index + 1);
         return str;
+        */
     }
 }

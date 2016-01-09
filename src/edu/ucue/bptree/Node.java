@@ -30,7 +30,7 @@ public final class Node<K, V> {
         this.nodeSize = 0;
         this.keysNumber = keysNumber;
         this.keys = (K[]) new Object[this.keysNumber + 1];
-        this.children = new Node[this.keysNumber + 1];
+        this.children = new Node[this.keysNumber + 2];
         this.values = (V[]) new Object[this.keysNumber + 1];
         this.comparator = comparator;
     }
@@ -124,5 +124,13 @@ public final class Node<K, V> {
      */
     public void setParent(Node parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for(int i = 0; i < getNodeSize(); i++)
+            str += keys[i] + " ";
+        return str;
     }
 }
