@@ -98,6 +98,19 @@ public final class Node<K, V> {
         values[i + 1] = value;
         nodeSize++;
     }
+    
+    public void insert(K key, Node child){
+        int i = getNodeSize() - 1;
+        while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
+            keys[i + 1] = keys[i];
+            children[i + 2] = children[i + 1];
+            children[i + 1] = children[i];
+            i--;
+        }
+        keys[i + 1] = key;
+        children[i + 2] = child;
+        nodeSize++;
+    }
 
     /**
      * @return the parent

@@ -1,5 +1,5 @@
 /**
- * Tree / Árbol
+ * B+ Tree / Árbol B+
  */
 package edu.ucue.bptree;
 
@@ -14,7 +14,7 @@ import java.util.Comparator;
 public class BPTree<K, V> {
     private Node<K, V> root; // Nodo raíz
     private final int keysNumber; // Número máximo de claves u órden de árbol
-    private final Comparator<K> comparator; // Objeto que provee el método para comparar las claves
+    private final Comparator<K> comparator; // Comparador de claves
     /**
      * Crea un nuevo árbol vacío.
      * @param KeysNumber Número máximo de claves.
@@ -26,6 +26,12 @@ public class BPTree<K, V> {
         this.root = new Node<>(true, keysNumber, comparator);
     }
     
+    /**
+     * Busca un valor por su clave, si no hay una coincidencia
+     * retorna null.
+     * @param key
+     * @return 
+     */
     public V search(K key){
         return search(key, root);
     }
@@ -45,6 +51,13 @@ public class BPTree<K, V> {
         return null;
     }
     
+    /**
+     * Agrega un valor, con su respectiva clave
+     * al árbol, manteniendo todos sus elementos
+     * ordenados por clave.
+     * @param key
+     * @param value 
+     */
     public void add(K key, V value){
         add(key, value, root);
     }
@@ -60,6 +73,7 @@ public class BPTree<K, V> {
         }
         if(leaf.getNodeSize() == keysNumber){
             Node newLeaf = new Node(true, keysNumber, comparator);
+            // Si el padre del nodo es nulo (solo hay un nodo hoja/root)
             if(leaf.getParent() == null){
                 leaf.insert(key, value);
                 
@@ -83,34 +97,37 @@ public class BPTree<K, V> {
                 
                 root.setChild(0, leaf);
                 root.setChild(1, newLeaf);
+            }else {
+                leaf.insert(key, value);
+                // Dividir claves/valores del nodo hoja
+                int k = 0;
+                for(int j = keysNumber/2; j < keysNumber + 1; j++){
+                    newLeaf.setKey(k, leaf.getKey(j));
+                    newLeaf.setValue(k, leaf.getValue(j));
+                    k++;
+                }
+                
+                leaf.setNodeSize((keysNumber)/2);
+                newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
+                
+                Node parent = leaf.getParent();
+                newLeaf.setParent(parent);
+                
+                parent.insert(newLeaf.getKey(0), newLeaf);
+                
             }
         }else {
             leaf.insert(key, value);
         }
     }
     
-    
-    /*
-    private void insert(Node node, K key, V value) {
-        int i = node.getNodeSize() - 1;
-        if(node.isLeaf()){
-            //node.insert(key, value);
-            while(i >= 0 && comparator.compare(key, (K) node.getKey(i)) < 0){
-                node.setKey(i + 1, node.getKey(i));
-                node.setValue(i + 1, node.getValue(i));
-                i--;
-            }
-            node.setKey(i + 1, key);
-            node.setValue(i + 1, value);
-            node.setNodeSize(node.getNodeSize() + 1);
-        }else {
-        }
-    }
-    */
-    
     private void split() {
     }
     
+    /**
+     * 
+     * @return 
+     */
     public Node<K, V> getRoot() {
         return root;
     }
@@ -122,12 +139,19 @@ public class BPTree<K, V> {
         return comparator;
     }
     
+
     @Override
     public String toString() {
         String str = "";
         return toString(root, 0);
     }
     
+    /**
+     * Retorna el árbol recorrido en preorden.
+     * @param node
+     * @param index
+     * @return 
+     */
     private String toString(Node node, int index){
         if(index >= node.getNodeSize() && node.isLeaf()){
             return "\n";
