@@ -13,43 +13,16 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        
+        String[] letters = {"Z", "W", "R", "A", "C", "B", "D", "E", "F", "H", "G", "M", "L", "I", "J", "K"};
+        
         BPTree<String, Integer> tree = new BPTree(3, new ComparatorString());
-        tree.add("Z", 2);
-        tree.add("W", 2);
-        tree.add("R", 2);
-        tree.add("A", 2);
-        tree.add("C", 2);
-        tree.add("B", 2);
-        tree.add("D", 2);
-        tree.add("E", 2);
-        tree.add("F", 2);
-        System.out.println("Z W R A C B D E F *********************");
+        
+        System.out.println("Orden de insercion: " + String.join(" ", letters));
+        for(int i = 0; i < letters.length; i++)
+            tree.add(letters[i], i);
         System.out.println(tree);
         tree.showAll();
-        System.out.println("");
-        tree.showAllInverse();
-        System.out.println("");
-        tree.add("H", 2);
-        System.out.println("H *********************");
-        System.out.println(tree);
-        tree.showAll();
-        System.out.println("");
-        tree.showAllInverse();
-        System.out.println("");
-        tree.add("G", 2);
-        System.out.println("G *********************");
-        System.out.println(tree);
-        tree.showAll();
-        System.out.println("");
-        tree.showAllInverse();
-        System.out.println("");
-        tree.add("M", 2);
-        System.out.println("M *********************");
-        System.out.println(tree);
-        tree.showAll();
-        System.out.println("");
-        tree.showAllInverse();
-        System.out.println("");
+        System.out.println();
     }
 }

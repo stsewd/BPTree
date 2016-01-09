@@ -145,7 +145,7 @@ public class BPTree<K, V> {
 
             // Dividir claves/valores del nodo interno
             int k = 0;
-            int j;
+            int j = 0;
             for(j = (keysNumber)/2 + 1; j < keysNumber + 1; j++){
                 newNode.setKey(k, node.getKey(j));
                 newNode.setChild(k, node.getChild(j));
@@ -186,7 +186,7 @@ public class BPTree<K, V> {
         newNode.setParent(parent);
         
         parent.insert(node.getKey((keysNumber)/2), newNode);
-        if(parent.getNodeSize() == keysNumber)
+        if(parent.getNodeSize() > keysNumber)
             splitInnerNode(parent);
     }
     
