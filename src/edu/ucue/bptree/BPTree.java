@@ -96,7 +96,9 @@ public class BPTree<K, V> {
                 root.setNodeSize(1);
                 
                 newLeaf.setNext(null);
+                newLeaf.setPrev(leaf);
                 leaf.setNext(newLeaf);
+                leaf.setPrev(null);
                 
                 leaf.setParent(root);
                 newLeaf.setParent(root);
@@ -117,6 +119,8 @@ public class BPTree<K, V> {
                 newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
                 
                 newLeaf.setNext(leaf.next());
+                leaf.next().setPrev(newLeaf);
+                newLeaf.setPrev(leaf);
                 leaf.setNext(newLeaf);
                 
                 Node parent = leaf.getParent();
@@ -186,6 +190,59 @@ public class BPTree<K, V> {
             splitInnerNode(parent);
     }
     
+    public void del(K key){
+        
+    }
+    
+    private void del(K key, Node node){
+        // Comprobar si la clave existe
+        if(search(key) == null)
+            return;
+        // Buscar en qué hoja pertenece la clave a eliminar
+        Node leaf = node;
+        int i = 0;
+        while(!leaf.isLeaf()){
+            i = leaf.getNodeSize() - 1;
+            while(i >= 0 && comparator.compare(key, (K) leaf.getKey(i)) < 0)
+                i--;
+            leaf = leaf.getChild(i + 1);
+        }
+        
+        leaf.remove(key);
+        
+        if(leaf.getNodeSize() >= keysNumber/2)
+            return;
+        
+        // Pedir prestado de hermano izquierdo
+        
+        Node parent = leaf.getParent();
+        
+        Node leftLeaf = leaf.prev();
+        if(leftLeaf.getParent() == leaf.getParent() && leftLeaf.getNodeSize() > keysNumber/2){
+            int last = leftLeaf.getNodeSize() - 1;
+            leaf.insert(leftLeaf.getKey(last), leftLeaf.getValue(last));
+            leftLeaf.setNodeSize(leftLeaf.getNodeSize() - 1);
+            
+            parent.setKey(i, leaf.getKey(0));
+            
+            return;
+        }
+        
+        // Pedir prestado de hermano derecho
+        Node rightLeaf = leaf.next();
+        if(rightLeaf.getParent() == leaf.getParent() && rightLeaf.getNodeSize() > keysNumber/2){
+            int first = 0;
+            leaf.insert(rightLeaf.getKey(first), rightLeaf.getValue(first));
+            rightLeaf.remove(rightLeaf.getKey(first));
+            
+            parent.setKey(i, rightLeaf.getKey(first));
+            
+            return;
+        }
+        
+        // Merge
+    }
+    
     /**
      * 
      * @return 
@@ -240,6 +297,16 @@ public class BPTree<K, V> {
         while(leaf != null){
             System.out.print(leaf);
             leaf = leaf.next();
+        }
+    }
+    
+    public void showAllInverse(){
+        Node leaf = root;
+        while(!leaf.isLeaf())
+            leaf = leaf.getChild(leaf.getNodeSize());
+        while(leaf != null){
+            System.out.print(leaf);
+            leaf = leaf.prev();
         }
     }
 }

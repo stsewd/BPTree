@@ -28,21 +28,28 @@ public class Main {
         System.out.println(tree);
         tree.showAll();
         System.out.println("");
+        tree.showAllInverse();
+        System.out.println("");
         tree.add("H", 2);
         System.out.println("H *********************");
         System.out.println(tree);
         tree.showAll();
+        System.out.println("");
+        tree.showAllInverse();
         System.out.println("");
         tree.add("G", 2);
         System.out.println("G *********************");
         System.out.println(tree);
         tree.showAll();
         System.out.println("");
+        tree.showAllInverse();
+        System.out.println("");
         tree.add("M", 2);
         System.out.println("M *********************");
         System.out.println(tree);
         tree.showAll();
         System.out.println("");
+        tree.showAllInverse();
+        System.out.println("");
     }
-    
 }

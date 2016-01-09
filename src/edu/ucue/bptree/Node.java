@@ -17,6 +17,7 @@ public final class Node<K, V> {
     private int nodeSize; // Tamaño actual del nodo
     private Node parent;
     private Node next;
+    private Node prev;
     
     private final K[] keys; // Claves
     private final Node[] children; // hijos
@@ -30,9 +31,14 @@ public final class Node<K, V> {
         this.nodeSize = 0;
         this.keysNumber = keysNumber;
         this.keys = (K[]) new Object[this.keysNumber + 1];
-        this.children = new Node[this.keysNumber + 2];
-        this.values = (V[]) new Object[this.keysNumber + 1];
         this.comparator = comparator;
+        if(leaf){
+            this.values = (V[]) new Object[this.keysNumber + 1];
+            this.children = null;
+        }else {
+            this.values = null;
+            this.children = new Node[this.keysNumber + 2];
+        }
     }
     
     /**
@@ -43,8 +49,16 @@ public final class Node<K, V> {
         return next;
     }
     
+    public Node prev(){
+        return prev;
+    }
+    
     public void setNext(Node node){
         this.next = node;
+    }
+
+    public void setPrev(Node prev) {
+        this.prev = prev;
     }
 
     public void setNodeSize(int nodeSize) {
@@ -110,6 +124,26 @@ public final class Node<K, V> {
         keys[i + 1] = key;
         children[i + 2] = child;
         nodeSize++;
+    }
+    
+    public void remove(K key){
+        int i;
+        for(i = 0; i < getNodeSize(); i++){
+            if(keys[i] == key)
+                break;
+        }
+        
+        if(i >= getNodeSize())
+            return;
+        
+        for(int j = i + 1; j < getNodeSize(); j++){
+            keys[j - 1] = keys[j];
+            if(leaf){
+                values[j -1] = values[j];
+            }else {
+            }
+        }
+        nodeSize--;
     }
 
     /**
