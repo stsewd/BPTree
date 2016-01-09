@@ -95,6 +95,9 @@ public class BPTree<K, V> {
                 root.setKey(0, (K) newLeaf.getKey(0));
                 root.setNodeSize(1);
                 
+                newLeaf.setNext(null);
+                leaf.setNext(newLeaf);
+                
                 leaf.setParent(root);
                 newLeaf.setParent(root);
                 root.setChild(0, leaf);
@@ -112,6 +115,9 @@ public class BPTree<K, V> {
                 
                 leaf.setNodeSize((keysNumber)/2);
                 newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
+                
+                newLeaf.setNext(leaf.next());
+                leaf.setNext(newLeaf);
                 
                 Node parent = leaf.getParent();
                 newLeaf.setParent(parent);
@@ -223,5 +229,17 @@ public class BPTree<K, V> {
             str += toString(node.getChild(i));
         
         return str;
+    }
+    
+    public void showAll(){
+        // Buscar primera hoja
+        Node leaf = root;
+        while(!leaf.isLeaf())
+            leaf = leaf.getChild(0);
+        
+        while(leaf != null){
+            System.out.print(leaf);
+            leaf = leaf.next();
+        }
     }
 }

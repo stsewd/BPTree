@@ -26,16 +26,23 @@ public class Main {
         tree.add("F", 2);
         System.out.println("Z W R A C B D E F *********************");
         System.out.println(tree);
+        tree.showAll();
+        System.out.println("");
         tree.add("H", 2);
         System.out.println("H *********************");
         System.out.println(tree);
-        // aquí empieza el problema
+        tree.showAll();
+        System.out.println("");
         tree.add("G", 2);
         System.out.println("G *********************");
         System.out.println(tree);
+        tree.showAll();
+        System.out.println("");
         tree.add("M", 2);
         System.out.println("M *********************");
         System.out.println(tree);
+        tree.showAll();
+        System.out.println("");
     }
     
 }
