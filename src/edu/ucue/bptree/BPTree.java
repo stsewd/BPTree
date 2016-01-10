@@ -57,14 +57,10 @@ public class BPTree<K, V> {
      * ordenados por clave.
      * @param key
      * @param value 
-     */
+     */  
     public void add(K key, V value){
-        add(key, value, root);
-    }
-    
-    private void add(K key, V value, Node node){
         // Buscar en qué hoja pertenece la clave a insertar
-        Node leaf = node;
+        Node leaf = root;
         int i;
         while(!leaf.isLeaf()){
             i = leaf.getNodeSize() - 1;
@@ -73,67 +69,56 @@ public class BPTree<K, V> {
             leaf = leaf.getChild(i + 1);
         }
         
-        if(leaf.getNodeSize() == keysNumber){
-            Node newLeaf = new Node(true, keysNumber, comparator);
-            // Si el padre del nodo es nulo (solo hay un nodo hoja/root)
-            if(leaf.getParent() == null){
-                leaf.insert(key, value);
-                
-                root = new Node(false, keysNumber, comparator);
-                
-                // Dividir claves/valores del nodo hoja
-                int k = 0;
-                for(int j = (keysNumber)/2; j < keysNumber + 1; j++){
-                    newLeaf.setKey(k, leaf.getKey(j));
-                    newLeaf.setValue(k, leaf.getValue(j));
-                    k++;
-                }
-                
-                leaf.setNodeSize((keysNumber)/2);
-                newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
-                
-                root.setKey(0, (K) newLeaf.getKey(0));
-                root.setNodeSize(1);
-                
-                newLeaf.setNext(null);
-                newLeaf.setPrev(leaf);
-                leaf.setNext(newLeaf);
-                leaf.setPrev(null);
-                
-                leaf.setParent(root);
-                newLeaf.setParent(root);
-                root.setChild(0, leaf);
-                root.setChild(1, newLeaf);
-                
-            }else {
-                leaf.insert(key, value);
-                // Dividir claves/valores del nodo hoja
-                int k = 0;
-                for(int j = (keysNumber)/2; j < keysNumber + 1; j++){
-                    newLeaf.setKey(k, leaf.getKey(j));
-                    newLeaf.setValue(k, leaf.getValue(j));
-                    k++;
-                }
-                
-                leaf.setNodeSize((keysNumber)/2);
-                newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
-                
-                newLeaf.setNext(leaf.next());
-                leaf.next().setPrev(newLeaf);
-                newLeaf.setPrev(leaf);
-                leaf.setNext(newLeaf);
-                
-                Node parent = leaf.getParent();
-                newLeaf.setParent(parent);
-                
-                parent.insert(newLeaf.getKey(0), newLeaf);
-                
-                if(parent.getNodeSize() > keysNumber){
-                    splitInnerNode(parent);
-                }
-            }
+        leaf.insert(key, value);
+        
+        if(leaf.getNodeSize() <= keysNumber)
+            return;
+       
+        Node newLeaf = new Node(true, keysNumber, comparator);
+        
+        // Dividir claves/valores del nodo hoja
+        int k = 0;
+        int j = 0;
+        for(j = (keysNumber)/2; j < keysNumber + 1; j++){
+            newLeaf.setKey(k, leaf.getKey(j));
+            newLeaf.setValue(k, leaf.getValue(j));
+            k++;
+        }
+
+        leaf.setNodeSize((keysNumber)/2);
+        newLeaf.setNodeSize(keysNumber + 1 - (keysNumber)/2);
+        
+        
+        // Si el padre del nodo es nulo, la hoja es root
+        if(leaf.getParent() == null){
+            root = new Node(false, keysNumber, comparator);
+
+            root.setKey(0, (K) newLeaf.getKey(0));
+            root.setNodeSize(1);
+
+            newLeaf.setNext(null);
+            newLeaf.setPrev(leaf);
+            leaf.setNext(newLeaf);
+            leaf.setPrev(null);
+
+            leaf.setParent(root);
+            newLeaf.setParent(root);
+            root.setChild(0, leaf);
+            root.setChild(1, newLeaf);
+
         }else {
-            leaf.insert(key, value);
+            newLeaf.setNext(leaf.next());
+            leaf.next().setPrev(newLeaf);
+            newLeaf.setPrev(leaf);
+            leaf.setNext(newLeaf);
+
+            Node parent = leaf.getParent();
+            newLeaf.setParent(parent);
+
+            parent.insert(newLeaf.getKey(0), newLeaf);
+
+            if(parent.getNodeSize() > keysNumber)
+                splitInnerNode(parent);
         }
     }
     
@@ -191,7 +176,7 @@ public class BPTree<K, V> {
     }
     
     public void del(K key){
-        
+        del(key, root);
     }
     
     private void del(K key, Node node){
@@ -208,14 +193,17 @@ public class BPTree<K, V> {
             leaf = leaf.getChild(i + 1);
         }
         
+        Node parent = leaf.getParent();
+        
         leaf.remove(key);
+        parent.setKey(i, leaf.getKey(0));
         
         if(leaf.getNodeSize() >= keysNumber/2)
             return;
         
         // Pedir prestado de hermano izquierdo
         
-        Node parent = leaf.getParent();
+        
         
         Node leftLeaf = leaf.prev();
         if(leftLeaf.getParent() == leaf.getParent() && leftLeaf.getNodeSize() > keysNumber/2){
@@ -234,9 +222,15 @@ public class BPTree<K, V> {
             int first = 0;
             leaf.insert(rightLeaf.getKey(first), rightLeaf.getValue(first));
             rightLeaf.remove(rightLeaf.getKey(first));
-            
-            parent.setKey(i, rightLeaf.getKey(first));
-            
+
+            if(leaf.getNodeSize() == 1){
+                parent.remove(key);
+                parent.remove(leaf.getKey(first));
+                parent.insert(leaf.getKey(first), leaf);
+                parent.insert(rightLeaf.getKey(first), rightLeaf);
+            }else {
+                parent.setKey(i, rightLeaf.getKey(first));
+            }
             return;
         }
         

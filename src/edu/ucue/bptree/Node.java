@@ -141,6 +141,7 @@ public final class Node<K, V> {
             if(leaf){
                 values[j -1] = values[j];
             }else {
+                children[j] = children[j + 1];
             }
         }
         nodeSize--;
