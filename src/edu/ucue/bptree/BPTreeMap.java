@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -74,14 +72,14 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
             ram.write(obj);
             
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Archivo de datos no encontrado.");
         } catch (IOException ex) {
-            Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al escribir en archivo de datos.");
         } finally {
             try {
                 ram.close();
             } catch (IOException ex) {
-                Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Error al cerrar archivo de datos.");
             }
         }
         
@@ -126,11 +124,10 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
 
     @Override
     public V remove(Object key) {
-        tree.del((K) key);
-        return null;
+         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private V getObject(long pos){
+    private V getObject(long pos) {
         RandomAccessFile ram = null;
         byte[] objByte = new byte[OBJ_SIZE];
         V obj = null;
@@ -142,18 +139,17 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
             ram.read(objByte);
             
             obj = (V) deserialize(objByte);
-            
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Archivo de datos no encontrado.");
         } catch (IOException ex) {
-            Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al leer archivo de datos.");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al leer el objeto.");
         } finally {
             try {
                 ram.close();
             } catch (IOException ex) {
-                Logger.getLogger(BPTreeMap.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Erro al cerrar el archivo de datos.");
             }
         }
         

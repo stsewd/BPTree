@@ -33,12 +33,13 @@ public class Main {
         // Uso del árbol B+ con archivos (tabla de valores).
         
         // Objetos de prueba.
-        Person p1 = new Person("Test", "Apellido", 25);
-        Person p2 = new Person("Luis", "Perez000", 33);
-        Person p3 = new Person("0003", "Perez003", 33);
-        Person p4 = new Person("0004", "Perez004", 33);
+        Person p1 = new Person("0000", "Perez000", 25);
+        Person p2 = new Person("0001", "Perez001", 33);
+        Person p3 = new Person("0002", "Perez002", 33);
+        Person p4 = new Person("0003", "Perez003", 33);
         
-        // Obtener tamaño del objeto serializado (113).
+        // Obtener tamaño del objeto serializado
+        // (113 en el caso de los objetos de prueba creados).
         // * Asegurarse que el tamaño de todos los objetos
         // el mismo para todos.
         /* 
@@ -53,18 +54,29 @@ public class Main {
         
         // Ruta donde se manejará la tabla de valores.
         String path = "persons.dat";
+        
+        // Ruta donde se manejara tabla de índices.
         String arbolPath = "arbolPersons.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
         Map<String, Person> mapaTest = cargarArbol(path, arbolPath);
         
         // Agregamos los objetos al map
+        /*
         mapaTest.put(p3.lastName, p3);
         mapaTest.put(p4.lastName, p4);
+        mapaTest.put(p1.lastName, p1);
+        mapaTest.put(p2.lastName, p2);
+        /*/
         
         // Recuperamos
-        System.out.println(mapaTest.get(p4.lastName).toString());
-        System.out.println(mapaTest.get(p1.lastName).toString());
+        
+        // System.out.println(mapaTest.get(p4.lastName).toString());
+        // System.out.println(mapaTest.get(p1.lastName).toString());
+        /*
+        for(Person p : mapaTest.values())
+            System.out.println(p);
+        /*/
         
         // Guardar arbol
         FileOutputStream fos;
@@ -75,10 +87,14 @@ public class Main {
             oos.writeObject(mapaTest);
             
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Archivo no existente.");
         } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al escribir en el archivo.");
         }
+        
+        
+        // ********************************************************************
+        // ********************************************************************
         
         // Uso de árbol B+ sin archivos
         /*
@@ -126,11 +142,11 @@ public class Main {
             mapaTest = (Map) ois.readObject();
             
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Archivo no existente.");
         } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al leer el archivo.");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error al recuperar objeto.");
         }
         
         return mapaTest;
