@@ -21,12 +21,12 @@ public class Main {
         System.out.println("Orden de insercion: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++)
             tree.add(letters[i], i);
-
+/*
         tree.del("J");
         tree.del("R");
         tree.del("Z");
         tree.del("W");
-
+*/
         System.out.println(tree);
         tree.showAll();
         System.out.println();
