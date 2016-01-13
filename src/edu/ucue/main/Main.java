@@ -6,7 +6,12 @@ package edu.ucue.main;
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +35,8 @@ public class Main {
         // Objetos de prueba.
         Person p1 = new Person("Test", "Apellido", 25);
         Person p2 = new Person("Luis", "Perez000", 33);
+        Person p3 = new Person("0003", "Perez003", 33);
+        Person p4 = new Person("0004", "Perez004", 33);
         
         // Obtener tamaño del objeto serializado (113).
         // * Asegurarse que el tamaño de todos los objetos
@@ -46,18 +53,32 @@ public class Main {
         
         // Ruta donde se manejará la tabla de valores.
         String path = "persons.dat";
+        String arbolPath = "arbolPersons.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
-        Map<String, Person> mapaTest = new BPTreeMap(3, new ComparatorString(), path, 113);
+        Map<String, Person> mapaTest = cargarArbol(path, arbolPath);
         
         // Agregamos los objetos al map
-        mapaTest.put(p1.lastName, p1);
-        mapaTest.put(p2.lastName, p2);
+        mapaTest.put(p3.lastName, p3);
+        mapaTest.put(p4.lastName, p4);
         
         // Recuperamos
-        System.out.println(mapaTest.get(p2.lastName).toString());
+        System.out.println(mapaTest.get(p4.lastName).toString());
         System.out.println(mapaTest.get(p1.lastName).toString());
         
+        // Guardar arbol
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(arbolPath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            
+            oos.writeObject(mapaTest);
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         // Uso de árbol B+ sin archivos
         /*
@@ -89,6 +110,30 @@ public class Main {
                 
         */
         
+    }
+    
+    public static Map cargarArbol(String data, String arbolPath){
+        Map mapaTest = null;
+        
+        File path = new File(arbolPath);
+        if(!path.exists())
+            return new BPTreeMap(3, new ComparatorString(), data, 113);
+        
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            
+            mapaTest = (Map) ois.readObject();
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return mapaTest;
     }
     
     public static byte[] serialize(Object obj) throws IOException {

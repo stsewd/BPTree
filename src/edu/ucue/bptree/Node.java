@@ -3,6 +3,7 @@
  */
 package edu.ucue.bptree;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -13,7 +14,7 @@ import java.util.Comparator;
  * @param <K> Clave
  * @param <V> Valor
  */
-public final class Node<K, V> {
+public final class Node<K, V> implements Serializable {
     private boolean leaf; // Hoja
     
     private int nodeSize; // Tamaño actual del nodo

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author Santos Gallegos
  */
-public class BPTreeMap<K, V> implements Map<K, V> {
+public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
     private final File PATH;
     private final int OBJ_SIZE;
     private BPTree<K, Long> tree;

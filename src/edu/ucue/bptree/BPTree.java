@@ -3,6 +3,7 @@
  */
 package edu.ucue.bptree;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -13,7 +14,7 @@ import java.util.Comparator;
  * @param <K> Clave
  * @param <V> Valor
  */
-public class BPTree<K, V> {
+public class BPTree<K, V> implements Serializable {
     private Node<K, V> root; // Nodo raíz
     private final int keysNum; // Máximo de claves u órden de árbol
     private final int minKeysNum; // Mínimo de claves que puede tener un nodo (excepto root)

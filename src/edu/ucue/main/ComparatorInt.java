@@ -5,13 +5,14 @@
  */
 package edu.ucue.main;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  *
- * @author stsewd
+ * @author Santos Gallegos
  */
-class ComparatorInt implements Comparator<Integer> {
+class ComparatorInt implements Comparator<Integer>, Serializable {
 
     @Override
     public int compare(Integer o1, Integer o2) {
