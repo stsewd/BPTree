@@ -114,7 +114,8 @@ public class BPTree<K, V> {
 
         }else {
             newLeaf.setNext(leaf.next());
-            leaf.next().setPrev(newLeaf);
+            if(leaf.next() != null)
+                leaf.next().setPrev(newLeaf);
             newLeaf.setPrev(leaf);
             leaf.setNext(newLeaf);
 

@@ -14,7 +14,8 @@ public class Main {
      */
     public static void main(String[] args) {
         // Corregir -> Ceil de N/2 no floor de N/2
-        String[] letters = {"Z", "W", "R", "A", "C", "B", "D", "E", "F", "H", "G", "M", "L", "I", "J", "K"};
+        String[] letters = {"Z", "W", "R", "A", "C", "B", "D", "E", "F", "H",
+            "G", "M", "L", "I", "J", "K", "P", "X", "N", "O", "Y", "S", "T", "U", "V"};
         
         BPTree<String, Integer> tree = new BPTree(3, new ComparatorString());
         
