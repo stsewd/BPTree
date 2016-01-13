@@ -19,5 +19,8 @@ hs_err_pid*
 /manifest.mf
 /build/built-jar.properties
 
-#Archivos del sistema
+# Archivos del sistema
 *~
+
+# Archivos generados por el programa
+*.dat

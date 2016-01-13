@@ -3,6 +3,8 @@
  */
 package edu.ucue.bptree;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
@@ -343,5 +345,20 @@ public class BPTree<K, V> {
             System.out.print(leaf);
             leaf = leaf.next();
         }
+    }
+    
+    public Collection<V> values(){
+        ArrayList<V> values = new ArrayList();
+        
+        // Buscar primera hoja
+        Node leaf = root;
+        while(!leaf.isLeaf())
+            leaf = leaf.getChild(0);
+        
+        while(leaf != null){
+            values.addAll(leaf.values());
+            leaf = leaf.next();
+        }
+        return values;
     }
 }

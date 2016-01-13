@@ -4,9 +4,15 @@
 package edu.ucue.main;
 
 import edu.ucue.bptree.BPTree;
+import edu.ucue.bptree.BPTreeMap;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,6 +24,42 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
+        // Uso del árbol B+ con archivos (tabla de valores).
+        
+        // Objetos de prueba.
+        Person p1 = new Person("Test", "Apellido", 25);
+        Person p2 = new Person("Luis", "Perez000", 33);
+        
+        // Obtener tamaño del objeto serializado (113).
+        // * Asegurarse que el tamaño de todos los objetos
+        // el mismo para todos.
+        /* 
+        try {
+            byte[] b;
+            b = serialize(p1);
+            System.out.println(b.length);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        */
+        
+        // Ruta donde se manejará la tabla de valores.
+        String path = "persons.dat";
+        
+        // Construir map con el tipo de clave y el tipo de objeto a almacenar.
+        Map<String, Person> mapaTest = new BPTreeMap(3, new ComparatorString(), path, 113);
+        
+        // Agregamos los objetos al map
+        mapaTest.put(p1.lastName, p1);
+        mapaTest.put(p2.lastName, p2);
+        
+        // Recuperamos
+        System.out.println(mapaTest.get(p2.lastName).toString());
+        System.out.println(mapaTest.get(p1.lastName).toString());
+        
+        
+        // Uso de árbol B+ sin archivos
         /*
         String[] letters = {
             "Z", "W", "R", "A", "C", "B", "D", "E", "F",
@@ -30,7 +72,6 @@ public class Main {
         System.out.println("Orden de insercion: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++)
             tree.add(letters[i], i);
-        */
         
         ArrayList<Integer> n = new ArrayList();
         
@@ -45,5 +86,15 @@ public class Main {
         System.out.println(tree);
         tree.showAll();
         System.out.println();
+                
+        */
+        
+    }
+    
+    public static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
     }
 }

@@ -3,6 +3,8 @@
  */
 package edu.ucue.bptree;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
@@ -167,5 +169,12 @@ public final class Node<K, V> {
         for(int i = 0; i < getNodeSize(); i++)
             str += keys[i] + " ";
         return str;
+    }
+
+    public Collection<V> values() {
+        ArrayList<V> v = new ArrayList<>();
+        for(int i = 0; i < nodeSize; i++)
+            v.add(values[i]);
+        return v;
     }
 }
