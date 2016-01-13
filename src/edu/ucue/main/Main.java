@@ -1,8 +1,9 @@
 /**
  * B+ Tree / Árbol B+
  */
-package edu.ucue.bptree;
+package edu.ucue.main;
 
+import edu.ucue.bptree.BPTree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
