@@ -20,10 +20,10 @@ import java.util.Comparator;
  * @author Santos Gallegos
  */
 public class BPTreeMap<K, V> implements Serializable {
-    private final File PATH;
-    private final int OBJ_SIZE;
-    private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto
-    private BPTree<K, Long> tree;
+    private final File PATH; // Ruta donde se almacenará la tabla de valores.
+    private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
+    private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
+    private BPTree<K, Long> tree; // Árbol B+, tabla de índices.
     
     private BPTreeMap(int keysNumber, Comparator comparator, String path, int objSize) {
         tree = new BPTree(keysNumber, comparator);
@@ -45,8 +45,11 @@ public class BPTreeMap<K, V> implements Serializable {
         BPTreeMap tree = null;
         
         File path = new File(treePath);
-        if(!path.exists())
-            return new BPTreeMap(keysNumber, comparator, dataPath, objSize);
+        if(!path.exists()){
+            tree = new BPTreeMap(keysNumber, comparator, dataPath, objSize);
+            tree.save(treePath);
+            return tree;
+        }
         
         try {
             FileInputStream fis = new FileInputStream(path);
@@ -138,7 +141,8 @@ public class BPTreeMap<K, V> implements Serializable {
     
     /**
      * Agrega clave y posicion en tabla de indices,
-     * la tabla de valores no se ve modificada.
+     * la tabla de valores no se ve modificada,
+     * usar con cuidado.
      * @param key 
      * @param pos 
      */

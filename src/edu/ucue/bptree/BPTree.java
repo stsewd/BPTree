@@ -43,6 +43,7 @@ public class BPTree<K, V> implements Serializable {
     }
     
     private V search(K key, Node node){
+        // Más adelante usar metodo search leaf para la búsqueda.
         if(node.isLeaf()){
             for(int i = 0; i < node.getNodeSize(); i++){
                 if(comparator.compare(key, (K) node.getKey(i)) == 0)
@@ -57,6 +58,12 @@ public class BPTree<K, V> implements Serializable {
         return null;
     }
     
+    /**
+     * Retorna la hoja en donde debería ser insertada
+     * una clave, o donde podría estar esta.
+     * @param key
+     * @return 
+     */
     private Node searchLeaf(K key){
         Node leaf = root;
         int i;
@@ -133,6 +140,11 @@ public class BPTree<K, V> implements Serializable {
         }
     }
     
+    /**
+     * Divide un nodo de manera recursiva hasta que todos
+     * los nodos tengan el numero de claves adecuado.
+     * @param node 
+     */
     private void split(Node node) {
         Node newNode = new Node(false, keysNum, comparator);
 
@@ -351,11 +363,12 @@ public class BPTree<K, V> implements Serializable {
     public Collection<V> values(){
         ArrayList<V> values = new ArrayList();
         
-        // Buscar primera hoja
+        // Buscar primera hoja.
         Node leaf = root;
         while(!leaf.isLeaf())
             leaf = leaf.getChild(0);
         
+        // Recorrer todos los elementos del arbol de forma ordenada.
         while(leaf != null){
             values.addAll(leaf.values());
             leaf = leaf.next();
