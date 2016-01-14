@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -24,7 +26,7 @@ public class Main {
         /*********************************************************************/
         /*********************************************************************/
         
-        // Uso del árbol B+ con archivos (tabla de valores).
+        // Uso del árbol B+ con archivos (tabla de índices/valores).
         
         // Objetos de prueba.
         Person p1 = new Person("0000", "Perez000", 25);
@@ -42,6 +44,7 @@ public class Main {
             b = serialize(p1);
             System.out.println(b.length);
         } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         } 
         */
         
@@ -52,28 +55,47 @@ public class Main {
         String treePath = "arbolPersons.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
-        BPTreeMap<String, Person> bpTreeMap = BPTreeMap.getBPTree(3, new ComparatorString(), dataPath, treePath, 113);
+        BPTreeMap<String, Person> bpTreeMap = null;
+        try {
+            bpTreeMap = BPTreeMap.getBPTree(3, new ComparatorString(), dataPath, treePath, 113);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
         
-        // Agregamos los objetos al map
         /*
-        bpTreeMap.put(p3.lastName, p3);
-        bpTreeMap.put(p4.lastName, p4);
-        bpTreeMap.put(p1.lastName, p1);
-        bpTreeMap.put(p2.lastName, p2);
-        /*/
+        // Agregamos los objetos al arbol
+        try {
+            bpTreeMap.put(p3.lastName, p3);
+            bpTreeMap.put(p4.lastName, p4);
+            bpTreeMap.put(p1.lastName, p1);
+            bpTreeMap.put(p2.lastName, p2);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        */
         
+        /*
         // Recuperamos
+        try {
+            // System.out.println(bpTreeMap.get(p4.lastName).toString());
+            // System.out.println(bpTreeMap.get(p1.lastName).toString());
+            for(Person p : bpTreeMap.values())
+                System.out.println(p);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        */
         
-        // System.out.println(bpTreeMap.get(p4.lastName).toString());
-        // System.out.println(bpTreeMap.get(p1.lastName).toString());
-        /*
-        for(Person p : bpTreeMap.values())
-            System.out.println(p);
-        /*/
-        
-        // Guardar arbol
-        bpTreeMap.save(treePath);
-        
+        try {
+            // Guardar arbol
+            bpTreeMap.save(treePath);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
         
         /*********************************************************************/
         /*********************************************************************/

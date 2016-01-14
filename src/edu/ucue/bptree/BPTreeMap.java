@@ -40,8 +40,12 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param treePath
      * @param objSize
      * @return 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
-    public static BPTreeMap getBPTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize){
+    public static BPTreeMap getBPTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
+            throws FileNotFoundException, IOException, ClassNotFoundException
+    {
         BPTreeMap tree = null;
         
         File path = new File(treePath);
@@ -51,18 +55,14 @@ public class BPTreeMap<K, V> implements Serializable {
             return tree;
         }
         
+        FileInputStream fis = null;
         try {
-            FileInputStream fis = new FileInputStream(path);
+            fis = new FileInputStream(path);
             ObjectInputStream ois = new ObjectInputStream(fis);
             
             tree = (BPTreeMap) ois.readObject();
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo no existente.");
-        } catch (IOException ex) {
-            System.out.println("Error al leer el archivo.");
-        } catch (ClassNotFoundException ex) {
-            System.out.println("Error al recuperar objeto.");
+        } finally {
+            fis.close();
         }
         
         return tree;
@@ -100,8 +100,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * clave key.
      * @param key
      * @param value 
+     * @throws java.io.FileNotFoundException 
      */
-    public void put(K key, V value) {
+    public void put(K key, V value) throws FileNotFoundException, IOException {
         RandomAccessFile ram = null;
         byte[] obj;
         byte[] rest;
@@ -123,17 +124,8 @@ public class BPTreeMap<K, V> implements Serializable {
             // Llenar de bytes
             rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
             ram.write(rest);
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo de datos no encontrado.");
-        } catch (IOException ex) {
-            System.out.println("Error al escribir en archivo de datos.");
         } finally {
-            try {
-                ram.close();
-            } catch (IOException ex) {
-                System.out.println("Error al cerrar archivo de datos.");
-            }
+            ram.close();
         }
         
         tree.add(key, pos);
@@ -154,8 +146,11 @@ public class BPTreeMap<K, V> implements Serializable {
      * Retorna una colección con todos los elementos
      * almacenados en el árbol.
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
-    public Collection<V> values() {
+    public Collection<V> values() throws IOException, FileNotFoundException, ClassNotFoundException {
         ArrayList values = new ArrayList();
         for(Long pos : tree.values()){
             values.add(getObject(pos));
@@ -168,8 +163,11 @@ public class BPTreeMap<K, V> implements Serializable {
      * retorna null si este no existe.
      * @param key
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
-    public V get(K key) {
+    public V get(K key) throws IOException, FileNotFoundException, ClassNotFoundException {
         Long pos = tree.search(key);
         if(pos == null)
             return null;
@@ -192,7 +190,7 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param key 
      */
     public void remove(K key) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+         throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
@@ -201,7 +199,7 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param pos
      * @return 
      */
-    private V getObject(long pos) {
+    private V getObject(long pos) throws FileNotFoundException, IOException, ClassNotFoundException {
         RandomAccessFile ram = null;
         byte[] objByte;
         V obj = null;
@@ -213,18 +211,8 @@ public class BPTreeMap<K, V> implements Serializable {
             ram.read(objByte);
             
             obj = (V) deserialize(objByte);
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo de datos no encontrado.");
-        } catch (IOException ex) {
-            System.out.println("Error al leer archivo de datos.");
-        } catch (ClassNotFoundException ex) {
-            System.out.println("Error al leer el objeto.");
         } finally {
-            try {
-                ram.close();
-            } catch (IOException ex) {
-                System.out.println("Erro al cerrar el archivo de datos.");
-            }
+            ram.close();
         }
         
         return obj;
@@ -259,23 +247,21 @@ public class BPTreeMap<K, V> implements Serializable {
     /**
      * Guarda el árbol en la ruta dada.
      * @param treePath 
+     * @throws java.io.FileNotFoundException 
      */
-    public void save(String treePath){
-        FileOutputStream fos;
+    public void save(String treePath) throws FileNotFoundException, IOException {
+        FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(treePath);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             
             oos.writeObject(this);
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo no existente.");
-        } catch (IOException ex) {
-            System.out.println("Error al escribir en el archivo.");
+        } finally {
+            fos.close();
         }
     }
     
-    public void update(K key, V newValue){
+    public void update(K key, V newValue) throws FileNotFoundException, IOException {
         RandomAccessFile ram = null;
         byte[] obj;
         byte[] rest;
@@ -297,17 +283,8 @@ public class BPTreeMap<K, V> implements Serializable {
             // Llenar de bytes
             rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
             ram.write(rest);
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo de datos no encontrado.");
-        } catch (IOException ex) {
-            System.out.println("Error al escribir en archivo de datos.");
         } finally {
-            try {
-                ram.close();
-            } catch (IOException ex) {
-                System.out.println("Error al cerrar archivo de datos.");
-            }
+            ram.close();
         }
     }
     
