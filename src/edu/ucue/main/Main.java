@@ -72,7 +72,7 @@ public class Main {
         /*/
         
         // Guardar arbol
-        bpTreeMap.saveBPTree(treePath);
+        bpTreeMap.save(treePath);
         
         
         /*********************************************************************/
