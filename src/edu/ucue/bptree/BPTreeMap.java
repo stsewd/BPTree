@@ -81,6 +81,16 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
         tree.add((K) key, pos);
         return value;
     }
+    
+    /**
+     * Agrega clave y posicion en tabla de indices,
+     * la tabla de valores no se ve modificada.
+     * @param key 
+     * @param pos 
+     */
+    public void put(Object key, Long pos){
+        tree.add((K) key, pos);
+    }
 
     @Override
     public void putAll(Map m) {
@@ -115,6 +125,15 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
     public V get(Object key) {
         long pos = tree.search((K) key);
         return getObject(pos);
+    }
+    
+    /**
+     * Retorna la posicion donde se encuentra el objeto.
+     * @param key
+     * @return 
+     */
+    public Long getPos(Object key){
+        return tree.search((K) key);
     }
 
     @Override
@@ -163,5 +182,4 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
     }
-
 }
