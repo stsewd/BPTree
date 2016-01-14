@@ -3,7 +3,9 @@ package edu.ucue.bptree;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,47 +14,35 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
  * @author Santos Gallegos
  */
-public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
+public class BPTreeMap<K, V> implements Serializable {
     private final File PATH;
     private final int OBJ_SIZE;
     private BPTree<K, Long> tree;
     
-    public BPTreeMap(int keysNumber, Comparator comparator, String path, int objSize) {
+    private BPTreeMap(int keysNumber, Comparator comparator, String path, int objSize) {
         tree = new BPTree(keysNumber, comparator);
         PATH = new File(path);
         OBJ_SIZE = objSize;
     }
     
-    @Override
     public int size() {
         return values().size();
     }
 
-    @Override
     public boolean isEmpty() {
         return tree.getRoot().getNodeSize() == 0;
     }
 
-    @Override
-    public boolean containsKey(Object key) {
-        return tree.search((K) key) != null;
+    public boolean containsKey(K key) {
+        return tree.search(key) != null;
     }
 
-    @Override
-    public boolean containsValue(Object value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-
-    @Override
-    public Object put(Object key, Object value) {
+    public void put(K key, V value) {
         RandomAccessFile ram = null;
         byte[] obj;
         long pos = 0;
@@ -78,8 +68,7 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
             }
         }
         
-        tree.add((K) key, pos);
-        return value;
+        tree.add(key, pos);
     }
     
     /**
@@ -88,27 +77,11 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
      * @param key 
      * @param pos 
      */
-    public void put(Object key, Long pos){
-        tree.add((K) key, pos);
+    public void put(K key, Long pos){
+        tree.add(key, pos);
     }
 
-    @Override
-    public void putAll(Map m) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Set keySet() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Collection values() {
+    public Collection<V> values() {
         ArrayList values = new ArrayList();
         for(Long pos : tree.values()){
             values.add(getObject(pos));
@@ -116,14 +89,8 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
         return values;
     }
 
-    @Override
-    public Set entrySet() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public V get(Object key) {
-        long pos = tree.search((K) key);
+    public V get(K key) {
+        long pos = tree.search(key);
         return getObject(pos);
     }
     
@@ -132,12 +99,11 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
      * @param key
      * @return 
      */
-    public Long getPos(Object key){
-        return tree.search((K) key);
+    public Long getPos(K key){
+        return tree.search(key);
     }
 
-    @Override
-    public V remove(Object key) {
+    public void remove(K key) {
          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
@@ -181,5 +147,44 @@ public class BPTreeMap<K, V> implements Map<K, V>, Serializable {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
+    }
+    
+    public static BPTreeMap getBPTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize){
+        BPTreeMap tree = null;
+        
+        File path = new File(treePath);
+        if(!path.exists())
+            return new BPTreeMap(keysNumber, comparator, dataPath, objSize);
+        
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            
+            tree = (BPTreeMap) ois.readObject();
+            
+        } catch (FileNotFoundException ex) {
+            System.out.println("Archivo no existente.");
+        } catch (IOException ex) {
+            System.out.println("Error al leer el archivo.");
+        } catch (ClassNotFoundException ex) {
+            System.out.println("Error al recuperar objeto.");
+        }
+        
+        return tree;
+    }
+    
+    public void saveBPTree(String treePath){
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(treePath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            
+            oos.writeObject(this);
+            
+        } catch (FileNotFoundException ex) {
+            System.out.println("Archivo no existente.");
+        } catch (IOException ex) {
+            System.out.println("Error al escribir en el archivo.");
+        }
     }
 }

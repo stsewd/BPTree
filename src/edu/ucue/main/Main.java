@@ -3,21 +3,12 @@
  */
 package edu.ucue.main;
 
-import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -51,49 +42,37 @@ public class Main {
             b = serialize(p1);
             System.out.println(b.length);
         } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } 
         */
         
         // Ruta donde se manejará la tabla de valores.
-        String path = "persons.dat";
+        String dataPath = "persons.dat";
         
         // Ruta donde se manejara tabla de índices.
-        String arbolPath = "arbolPersons.dat";
+        String treePath = "arbolPersons.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
-        Map<String, Person> mapaTest = cargarArbol(path, arbolPath);
+        BPTreeMap<String, Person> bpTreeMap = BPTreeMap.getBPTree(3, new ComparatorString(), dataPath, treePath, 113);
         
         // Agregamos los objetos al map
         /*
-        mapaTest.put(p3.lastName, p3);
-        mapaTest.put(p4.lastName, p4);
-        mapaTest.put(p1.lastName, p1);
-        mapaTest.put(p2.lastName, p2);
+        bpTreeMap.put(p3.lastName, p3);
+        bpTreeMap.put(p4.lastName, p4);
+        bpTreeMap.put(p1.lastName, p1);
+        bpTreeMap.put(p2.lastName, p2);
         /*/
         
         // Recuperamos
         
-        // System.out.println(mapaTest.get(p4.lastName).toString());
-        // System.out.println(mapaTest.get(p1.lastName).toString());
+        // System.out.println(bpTreeMap.get(p4.lastName).toString());
+        // System.out.println(bpTreeMap.get(p1.lastName).toString());
         /*
-        for(Person p : mapaTest.values())
+        for(Person p : bpTreeMap.values())
             System.out.println(p);
         /*/
         
         // Guardar arbol
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(arbolPath);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            
-            oos.writeObject(mapaTest);
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo no existente.");
-        } catch (IOException ex) {
-            System.out.println("Error al escribir en el archivo.");
-        }
+        bpTreeMap.saveBPTree(treePath);
         
         
         /*********************************************************************/
@@ -129,30 +108,6 @@ public class Main {
                 
         */
         
-    }
-    
-    public static Map cargarArbol(String data, String arbolPath){
-        Map mapaTest = null;
-        
-        File path = new File(arbolPath);
-        if(!path.exists())
-            return new BPTreeMap(3, new ComparatorString(), data, 113);
-        
-        try {
-            FileInputStream fis = new FileInputStream(path);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            
-            mapaTest = (Map) ois.readObject();
-            
-        } catch (FileNotFoundException ex) {
-            System.out.println("Archivo no existente.");
-        } catch (IOException ex) {
-            System.out.println("Error al leer el archivo.");
-        } catch (ClassNotFoundException ex) {
-            System.out.println("Error al recuperar objeto.");
-        }
-        
-        return mapaTest;
     }
     
     public static byte[] serialize(Object obj) throws IOException {
