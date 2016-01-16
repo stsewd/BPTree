@@ -22,10 +22,9 @@ public class Main {
      */
     public static void main(String[] args) {
         
-        /*********************************************************************/
-        /*********************************************************************/
-        
-        // Uso del árbol B+ con archivos (tabla de índices/valores).
+        /********************************************************************
+         * Uso del árbol B+ con archivos (tabla de índices y valores).
+        *********************************************************************/
         
         // Objetos de prueba.
         Person p1 = new Person("0000", "Perez000", 25);
@@ -65,8 +64,8 @@ public class Main {
         }
         */
         
-        /*
         // Agregamos los objetos al arbol
+        /*
         try {
             bpTreeMap.put(p3.lastName, p3);
             bpTreeMap.put(p4.lastName, p4);
@@ -75,14 +74,15 @@ public class Main {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
         */
-        /*
+        
         // Recuperamos
+        /*
         try {
-            // System.out.println(bpTreeMap.get(p4.lastName).toString());
-            // System.out.println(bpTreeMap.get(p1.lastName).toString());
+            // System.out.println(bpTreeMap.get(p4.lastName));
+            // System.out.println(bpTreeMap.get(p1.lastName));
             for(Person p : bpTreeMap.values())
                 System.out.println(p);
         } catch (IOException ex) {
@@ -91,7 +91,6 @@ public class Main {
             System.out.println(ex.getMessage());
         }
         */
-        
         
         /*********************************************************************
          *  Uso de árbol B+ solo con archivo de indice.

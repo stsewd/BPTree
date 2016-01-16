@@ -25,7 +25,7 @@ public class BPTreeMap<K, V> implements Serializable {
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
     private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException {
-        tree = BPTree.getTree(keysNumber, comparator, treePath, 1500);
+        tree = BPTree.getTree(keysNumber, comparator, treePath, 1500); // 1500 es el tamño del nodo.
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
     }
