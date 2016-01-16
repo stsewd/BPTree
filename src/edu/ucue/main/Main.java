@@ -3,8 +3,11 @@
  */
 package edu.ucue.main;
 
+import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
+import edu.ucue.bptree.Node;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -38,10 +41,12 @@ public class Main {
         // (113 en el caso de los objetos de prueba creados).
         // * Asegurarse que el tamaño de todos los objetos
         // el mismo para todos.
-        /* 
+        /*
+        Node node = new Node(true, 5, new ComparatorString());
+        
         try {
             byte[] b;
-            b = serialize(p1);
+            b = serialize(node);
             System.out.println(b.length);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -49,12 +54,13 @@ public class Main {
         */
         
         // Ruta donde se manejará la tabla de valores.
-        String dataPath = "persons.dat";
+        String dataPath = "data/persons.dat";
         
         // Ruta donde se manejara tabla de índices.
-        String treePath = "arbolPersons.dat";
+        String treePath = "data/persons_lastname_index.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
+        /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
             bpTreeMap = BPTreeMap.getBPTree(3, new ComparatorString(), dataPath, treePath, 113);
@@ -63,6 +69,7 @@ public class Main {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
+        */
         
         /*
         // Agregamos los objetos al arbol
@@ -73,9 +80,10 @@ public class Main {
             bpTreeMap.put(p2.lastName, p2);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         */
-        
         /*
         // Recuperamos
         try {
@@ -90,30 +98,46 @@ public class Main {
         }
         */
         
-        try {
-            // Guardar arbol
-            bpTreeMap.save(treePath);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
         
         /*********************************************************************/
         /*********************************************************************/
         
-        // Uso de árbol B+ sin archivos
-        /*
+        // Uso de árbol B+ solo con archivo de indice.
         String[] letters = {
             "Z", "W", "R", "A", "C", "B", "D", "E", "F",
-            "H", "G", "M", "L", "I", "J", "K", "P", "X",
+            "H", "G", "M", "L", "I", "J", "K", "P","X",
             "N", "O", "Y", "S", "T", "U", "V"
         };
         
-        BPTree<String, Integer> tree = new BPTree(3, new ComparatorString());
-        
+        BPTree<String> tree = null;
+        try {
+            tree = BPTree.getBPTree(3, new ComparatorString(), treePath, 1500);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+
         System.out.println("Orden de insercion: " + String.join(" ", letters));
-        for(int i = 0; i < letters.length; i++)
-            tree.add(letters[i], i);
+        for(int i = 0; i < letters.length; i++){
+            try {
+                tree.add(letters[i], 0L);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            } catch (ClassNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
         
+        System.out.println(tree);
+        
+        try {
+            tree.showAll();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        /*
         ArrayList<Integer> n = new ArrayList();
         
         for(int i = 0; i < 1000; i++)
@@ -129,7 +153,6 @@ public class Main {
         System.out.println();
                 
         */
-        
     }
     
     public static byte[] serialize(Object obj) throws IOException {

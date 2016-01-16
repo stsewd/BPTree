@@ -12,19 +12,19 @@ import java.util.Comparator;
  *
  * @author Santos Gallegos
  * @param <K> Clave
- * @param <V> Valor
  */
-public final class Node<K, V> implements Serializable {
+public final class Node<K> implements Serializable {
     private boolean leaf; // Hoja
     
     private int nodeSize; // Tamaño actual del nodo
-    private Node parent;
-    private Node next;
-    private Node prev;
+    private Long parent; // Posicion dentro del archivo donde esta el padre
+    private Long next; 
+    private Long prev;
     
+    private Long pos; // Posicion del nodo dentro del archivo.
     private final K[] keys; // Claves
-    private final Node[] children; // hijos
-    private final V[] values; // Valores
+    private final Long[] children; // hijos
+    private final Long[] values; // Valores
     
     private final int keysNumber; // Número máximo de claves
     private final Comparator<K> comparator; // Comparador de claves
@@ -35,32 +35,41 @@ public final class Node<K, V> implements Serializable {
         this.keysNumber = keysNumber;
         this.keys = (K[]) new Object[this.keysNumber + 1];
         this.comparator = comparator;
+        this.parent = null;
         if(leaf){
-            this.values = (V[]) new Object[this.keysNumber + 1];
+            this.values = new Long[this.keysNumber + 1];
             this.children = null;
         }else {
             this.values = null;
-            this.children = new Node[this.keysNumber + 2];
+            this.children = new Long[this.keysNumber + 2];
         }
+    }
+
+    public void setPos(Long pos) {
+        this.pos = pos;
+    }
+
+    public Long getPos() {
+        return pos;
     }
     
     /**
      * Retorna el siguiente nodo hoja (lista de claves).
      * @return 
      */
-    public Node next(){
+    public Long next(){
         return next;
     }
     
-    public Node prev(){
+    public Long prev(){
         return prev;
     }
     
-    public void setNext(Node node){
+    public void setNext(Long node){
         this.next = node;
     }
 
-    public void setPrev(Node prev) {
+    public void setPrev(Long prev) {
         this.prev = prev;
     }
 
@@ -68,11 +77,11 @@ public final class Node<K, V> implements Serializable {
         this.nodeSize = nodeSize;
     }
     
-    public V getValue(int index){
+    public Long getValue(int index){
         return values[index];
     }
 
-    public void setValue(int index, V value){
+    public void setValue(int index, Long value){
         values[index] = value;
     }
     
@@ -84,11 +93,11 @@ public final class Node<K, V> implements Serializable {
         keys[index] = key;
     }
     
-    public Node getChild(int index){
+    public Long getChild(int index){
         return children[index];
     }
     
-    public void setChild(int index, Node child){
+    public void setChild(int index, Long child){
         children[index] = child;
     }
 
@@ -104,7 +113,7 @@ public final class Node<K, V> implements Serializable {
         this.leaf = leaf;
     }
    
-    public void insert(K key, V value){
+    public void insertValue(K key, Long value){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];
@@ -116,7 +125,7 @@ public final class Node<K, V> implements Serializable {
         nodeSize++;
     }
     
-    public void insert(K key, Node child){
+    public void insertChild(K key, Long child){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];
@@ -153,14 +162,14 @@ public final class Node<K, V> implements Serializable {
     /**
      * @return the parent
      */
-    public Node getParent() {
+    public Long getParent() {
         return parent;
     }
 
     /**
      * @param parent the parent to set
      */
-    public void setParent(Node parent) {
+    public void setParent(Long parent) {
         this.parent = parent;
     }
 
@@ -172,8 +181,8 @@ public final class Node<K, V> implements Serializable {
         return str;
     }
 
-    public Collection<V> values() {
-        ArrayList<V> v = new ArrayList<>();
+    public Collection<Long> values() {
+        ArrayList<Long> v = new ArrayList<>();
         for(int i = 0; i < nodeSize; i++)
             v.add(values[i]);
         return v;
