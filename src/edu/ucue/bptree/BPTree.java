@@ -50,7 +50,7 @@ public class BPTree<K> implements Serializable {
         setRoot(root);
     }
     
-    public static BPTree getBPTree(int keysNumber, Comparator comparator, String path, int objSize) throws FileNotFoundException, IOException {
+    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int objSize) throws FileNotFoundException, IOException {
         BPTree tree = null;
         
         File treePath = new File(path);

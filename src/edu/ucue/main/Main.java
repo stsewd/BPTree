@@ -5,15 +5,11 @@ package edu.ucue.main;
 
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
-import edu.ucue.bptree.Node;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -42,15 +38,13 @@ public class Main {
         // * Asegurarse que el tamaño de todos los objetos
         // el mismo para todos.
         /*
-        Node node = new Node(true, 5, new ComparatorString());
-        
         try {
             byte[] b;
-            b = serialize(node);
+            b = serialize(p1);
             System.out.println(b.length);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
-        } 
+        }
         */
         
         // Ruta donde se manejará la tabla de valores.
@@ -63,7 +57,7 @@ public class Main {
         /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
-            bpTreeMap = BPTreeMap.getBPTree(3, new ComparatorString(), dataPath, treePath, 113);
+            bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 113);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         } catch (ClassNotFoundException ex) {
@@ -99,22 +93,27 @@ public class Main {
         */
         
         
-        /*********************************************************************/
-        /*********************************************************************/
+        /*********************************************************************
+         *  Uso de árbol B+ solo con archivo de indice.
+        *********************************************************************/
         
-        // Uso de árbol B+ solo con archivo de indice.
+        // Prueba con claves de tipo String
+        
+        /*
+        BPTree<String> tree = null;
+        
+        try {
+            tree = BPTree.getTree(3, new ComparatorString(), treePath, 1500);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+         
         String[] letters = {
             "Z", "W", "R", "A", "C", "B", "D", "E", "F",
             "H", "G", "M", "L", "I", "J", "K", "P","X",
             "N", "O", "Y", "S", "T", "U", "V"
         };
         
-        BPTree<String> tree = null;
-        try {
-            tree = BPTree.getBPTree(3, new ComparatorString(), treePath, 1500);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
 
         System.out.println("Orden de insercion: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++){
@@ -136,6 +135,9 @@ public class Main {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
+        */
+        
+        // Prueba con claves de tipo entero.
         
         /*
         ArrayList<Integer> n = new ArrayList();
@@ -144,14 +146,33 @@ public class Main {
             n.add(i);
         Collections.shuffle(n);
         
-        BPTree<Integer, Integer> tree = new BPTree(3, new ComparatorInt());
+        BPTree<Integer> tree = null;
+        
+        try {
+            tree = BPTree.getTree(3, new ComparatorInt(), treePath, 1500);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
         System.out.println(n);
         for(int i = 0; i < 1000; i++)
-            tree.add(n.get(i), i);
+            try {
+                tree.add(n.get(i), 0L);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            } catch (ClassNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        
         System.out.println(tree);
-        tree.showAll();
-        System.out.println();
-                
+        
+        try {
+            tree.showAll();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
         */
     }
     

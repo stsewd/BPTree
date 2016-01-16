@@ -3,7 +3,6 @@ package edu.ucue.bptree;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class BPTreeMap<K, V> implements Serializable {
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
     private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException {
-        tree = BPTree.getBPTree(keysNumber, comparator, treePath, 1500);
+        tree = BPTree.getTree(keysNumber, comparator, treePath, 1500);
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
     }
@@ -43,34 +42,20 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
      */
-    public static BPTreeMap getBPTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
+    public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
             throws FileNotFoundException, IOException, ClassNotFoundException
     {
-        BPTreeMap tree = null;
         
-        tree = new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize);
-        
-        return tree;
-        
-        /*
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(path);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            
-            tree = (BPTreeMap) ois.readObject();
-        } finally {
-            fis.close();
-        }
-        
-        return tree;
-        */
+        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize);
     }
     
     /**
      * Retorna el número de elementos que contiene
      * el árbol.
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public int size() throws IOException, FileNotFoundException, ClassNotFoundException {
         return tree.values().size();
@@ -100,6 +85,7 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param key
      * @param value 
      * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public void put(K key, V value) throws FileNotFoundException, IOException, ClassNotFoundException {
         RandomAccessFile ram = null;
@@ -136,6 +122,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * usar con cuidado.
      * @param key 
      * @param pos 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public void put(K key, Long pos) throws IOException, FileNotFoundException, ClassNotFoundException{
         tree.add(key, pos);
@@ -177,6 +166,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * Retorna la posicion donde se encuentra el objeto.
      * @param key
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public Long getPos(K key) throws IOException, FileNotFoundException, ClassNotFoundException{
         return tree.search(key);
