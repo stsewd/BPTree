@@ -39,7 +39,9 @@ public class BPTree<K> implements Serializable {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    private BPTree(int keysNumber, Comparator<K> comparator, String path, int objSize, Long root) throws FileNotFoundException, IOException {
+    private BPTree(int keysNumber, Comparator<K> comparator, String path, int objSize, Long root)
+            throws FileNotFoundException, IOException
+    {
         
         this.keysNum = keysNumber;
         this.comparator = comparator;
@@ -50,7 +52,9 @@ public class BPTree<K> implements Serializable {
         setRoot(root);
     }
     
-    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int objSize) throws FileNotFoundException, IOException {
+    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int objSize)
+            throws FileNotFoundException, IOException, ObjectSizeException
+    {
         BPTree tree = null;
         
         File treePath = new File(path);
@@ -146,8 +150,11 @@ public class BPTree<K> implements Serializable {
      * @throws java.io.IOException 
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
+     * @throws edu.ucue.bptree.ObjectSizeException 
      */  
-    public void add(K key, Long value) throws IOException, FileNotFoundException, ClassNotFoundException{
+    public void add(K key, Long value)
+            throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException 
+    {
         // Buscar en qué hoja pertenece la clave a insertar
         Node leaf = getNode(searchLeaf(key));
         
@@ -238,7 +245,7 @@ public class BPTree<K> implements Serializable {
      * los nodos tengan el numero de claves adecuado.
      * @param node 
      */
-    private void split(Long nodePos) throws IOException, FileNotFoundException, ClassNotFoundException {
+    private void split(Long nodePos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
         Node node = getNode(nodePos);
         
         Node newNode = new Node(false, keysNum, comparator);
@@ -539,7 +546,7 @@ public class BPTree<K> implements Serializable {
         return is.readObject();
     }
     
-    private Long saveNode(Node node) throws IOException{
+    private Long saveNode(Node node) throws IOException, ObjectSizeException{
         byte[] obj;
         byte[] rest;
         long pos = 0;
@@ -552,10 +559,8 @@ public class BPTree<K> implements Serializable {
             
             obj = serialize(node);
             
-            if(obj.length > OBJ_SIZE){
-                System.out.println("Limite.");
-                return null; // Reemplazar por lanzar excepcion
-            }
+            if(obj.length > OBJ_SIZE)
+                throw new ObjectSizeException();
             
             raf.seek(pos);
             raf.writeInt(obj.length);
@@ -570,7 +575,7 @@ public class BPTree<K> implements Serializable {
         return pos;
     }
     
-    private void updateNode(Node newNode, Long pos) throws FileNotFoundException, IOException{
+    private void updateNode(Node newNode, Long pos) throws FileNotFoundException, IOException, ObjectSizeException{
         byte[] obj;
         byte[] rest;
         RandomAccessFile raf = null;
@@ -579,10 +584,9 @@ public class BPTree<K> implements Serializable {
             
             obj = serialize(newNode);
             
-            if(obj.length > OBJ_SIZE){
-                System.out.println("Muy grande!");
-                return; // Reemplazar por lanzar excepcion
-            }
+            if(obj.length > OBJ_SIZE)
+                throw new ObjectSizeException();
+                
             raf.seek(pos);
             raf.writeInt(obj.length);
             raf.write(obj);
@@ -596,7 +600,7 @@ public class BPTree<K> implements Serializable {
         }
     }
     
-    private void updateNode(Node node) throws IOException{
+    private void updateNode(Node node) throws IOException, FileNotFoundException, ObjectSizeException{
         updateNode(node, node.getPos());
     }
     

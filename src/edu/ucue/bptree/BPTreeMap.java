@@ -24,7 +24,7 @@ public class BPTreeMap<K, V> implements Serializable {
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
-    private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException {
+    private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException, FileNotFoundException, ObjectSizeException {
         tree = BPTree.getTree(keysNumber, comparator, treePath, 1500); // 1500 es el tamño del nodo.
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
@@ -41,9 +41,10 @@ public class BPTreeMap<K, V> implements Serializable {
      * @return 
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
+     * @throws edu.ucue.bptree.ObjectSizeException 
      */
     public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
-            throws FileNotFoundException, IOException, ClassNotFoundException
+            throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException
     {
         
         return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize);
@@ -64,6 +65,9 @@ public class BPTreeMap<K, V> implements Serializable {
     /**
      * Retorna true si el árbol está vacío.
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public boolean isEmpty() throws IOException, FileNotFoundException, ClassNotFoundException {
         return size() == 0;
@@ -74,6 +78,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * dentro del árbol.
      * @param key
      * @return 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
      */
     public boolean containsKey(K key) throws IOException, FileNotFoundException, ClassNotFoundException {
         return tree.search(key) != null;
@@ -86,8 +93,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param value 
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
+     * @throws edu.ucue.bptree.ObjectSizeException 
      */
-    public void put(K key, V value) throws FileNotFoundException, IOException, ClassNotFoundException {
+    public void put(K key, V value) throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException {
         RandomAccessFile ram = null;
         byte[] obj;
         byte[] rest;
@@ -99,7 +107,7 @@ public class BPTreeMap<K, V> implements Serializable {
             obj = serialize(value);
             
             if(obj.length > OBJ_SIZE)
-                return; // Reemplazar por lanzar excepcion
+                throw new ObjectSizeException();
             
             pos = ram.length();
             ram.seek(pos);
@@ -125,8 +133,9 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws java.io.IOException 
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
+     * @throws edu.ucue.bptree.ObjectSizeException 
      */
-    public void put(K key, Long pos) throws IOException, FileNotFoundException, ClassNotFoundException{
+    public void put(K key, Long pos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException{
         tree.add(key, pos);
     }
 
@@ -252,7 +261,7 @@ public class BPTreeMap<K, V> implements Serializable {
         }
     }
     
-    public void update(K key, V newValue) throws FileNotFoundException, IOException, ClassNotFoundException {
+    public void update(K key, V newValue) throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException {
         RandomAccessFile ram = null;
         byte[] obj;
         byte[] rest;
@@ -264,7 +273,7 @@ public class BPTreeMap<K, V> implements Serializable {
             obj = serialize(newValue);
             
             if(obj.length > OBJ_SIZE)
-                return; // Reemplazar por lanzar excepcion
+                throw new ObjectSizeException();
             
             pos = getPos(key);
             ram.seek(pos);

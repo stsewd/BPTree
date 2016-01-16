@@ -41,7 +41,7 @@ public class Main {
             byte[] b;
             b = serialize(p1);
             System.out.println(b.length);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
@@ -57,9 +57,7 @@ public class Main {
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
             bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 113);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
@@ -71,9 +69,7 @@ public class Main {
             bpTreeMap.put(p4.lastName, p4);
             bpTreeMap.put(p1.lastName, p1);
             bpTreeMap.put(p2.lastName, p2);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
@@ -85,9 +81,7 @@ public class Main {
             // System.out.println(bpTreeMap.get(p1.lastName));
             for(Person p : bpTreeMap.values())
                 System.out.println(p);
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
@@ -103,7 +97,7 @@ public class Main {
         
         try {
             tree = BPTree.getTree(3, new ComparatorString(), treePath, 1500);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
          
@@ -118,9 +112,7 @@ public class Main {
         for(int i = 0; i < letters.length; i++){
             try {
                 tree.add(letters[i], 0L);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            } catch (ClassNotFoundException ex) {
+            } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
@@ -129,9 +121,7 @@ public class Main {
         
         try {
             tree.showAll();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
@@ -149,7 +139,7 @@ public class Main {
         
         try {
             tree = BPTree.getTree(3, new ComparatorInt(), treePath, 1500);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         
@@ -157,9 +147,7 @@ public class Main {
         for(int i = 0; i < 1000; i++)
             try {
                 tree.add(n.get(i), 0L);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            } catch (ClassNotFoundException ex) {
+            } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         
@@ -167,9 +155,7 @@ public class Main {
         
         try {
             tree.showAll();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        } catch (ClassNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
