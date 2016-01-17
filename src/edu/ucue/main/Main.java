@@ -168,6 +168,21 @@ public class Main {
             System.out.println(tree);
             tree.showAll();
             System.out.println();
+            
+            tree.del(8);
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
+            
+            tree.del(9);
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
+            
+            tree.del(5); // Buscar error en este caso
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
         } catch (Exception ex) {
             System.out.println("Error: " + ex);
         }

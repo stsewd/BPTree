@@ -348,6 +348,8 @@ public class BPTree<K> implements Serializable {
                 i--;
             leaf = getNode(leaf.getChild(i + 1));
         }
+        if(i < 0)
+            i++;
         
         Node parent = getNode(leaf.getParent());
         
@@ -449,10 +451,11 @@ public class BPTree<K> implements Serializable {
         int i = 0;
         
         // Buscar posicion de hijo en padre.
-        i = 0;
-        for(i = 1; i < parent.getNodeSize() + 1; i++){
-            if(Objects.equals(parent.getChild(i), node.getPos()))
-                break;
+        if(parent != null){
+            for(i = 1; i < parent.getNodeSize() + 1; i++){
+                if(Objects.equals(parent.getChild(i), node.getPos()))
+                    break;
+            }
         }
         
         // Eliminar clave.
@@ -461,7 +464,7 @@ public class BPTree<K> implements Serializable {
         updateNode(node);
         
         // Nueva raiz.
-        if(node.getNodeSize() == 0){
+        if(node.getNodeSize() == 0 && parent == null){
             Node child = getNode(node.getChild(0));
             child.setParent(null);
             updateNode(child);
