@@ -179,7 +179,17 @@ public class Main {
             tree.showAll();
             System.out.println();
             
-            tree.del(5); // Buscar error en este caso
+            tree.del(5);
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
+            
+            tree.del(2);
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
+            
+            tree.del(1);
             System.out.println(tree);
             tree.showAll();
             System.out.println();
