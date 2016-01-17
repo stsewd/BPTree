@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Árbol B+.
@@ -23,8 +24,8 @@ import java.util.Comparator;
  */
 public class BPTree<K> implements Serializable {
     private Long root; // Nodo raíz
-    private final int keysNum; // Máximo de claves u órden de árbol
-    private final int minKeysNum; // Mínimo de claves que puede tener un nodo (excepto root)
+    private final int maxKeys; // Máximo de claves
+    private final int minKeys; // Mínimo de claves que puede tener un nodo (excepto root)
     private final Comparator<K> comparator; // Comparador de claves
     private final File PATH; // Ruta donde se almacenara la tabla de indices
     private final int OBJ_SIZE; // Tamaño max reservado para cada nodo.
@@ -32,20 +33,20 @@ public class BPTree<K> implements Serializable {
     
     /**
      * Crea un nuevo árbol vacío.
-     * @param keysNumber Número máximo de claves.
+     * @param order Número máximo de claves.
      * @param comparator Objeto necesario para comparar las claves.
      * @param path
      * @param objSize
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    private BPTree(int keysNumber, Comparator<K> comparator, String path, int objSize, Long root)
+    private BPTree(int order, Comparator<K> comparator, String path, int objSize, Long root)
             throws FileNotFoundException, IOException
     {
         
-        this.keysNum = keysNumber;
+        this.maxKeys = order - 1;
         this.comparator = comparator;
-        this.minKeysNum = (int) Math.ceil(keysNum/2.0);
+        this.minKeys = (int) Math.ceil(order/2.0) - 1;
         this.OBJ_SIZE = objSize;
         this.PATH = new File(path);
         
@@ -162,23 +163,23 @@ public class BPTree<K> implements Serializable {
         
         updateNode(leaf);
         
-        if(leaf.getNodeSize() <= keysNum)
+        if(leaf.getNodeSize() <= maxKeys)
             return;
        
-        Node newLeaf = new Node(true, keysNum, comparator);
+        Node newLeaf = new Node(true, maxKeys, comparator);
         saveNode(newLeaf);
         
         // Dividir claves/valores del nodo hoja
         int k = 0;
         int j = 0;
-        for(j = minKeysNum; j < keysNum + 1; j++){
+        for(j = minKeys; j < maxKeys + 1; j++){
             newLeaf.setKey(k, leaf.getKey(j));
             newLeaf.setValue(k, leaf.getValue(j));
             k++;
         }
 
-        leaf.setNodeSize(minKeysNum);
-        newLeaf.setNodeSize(keysNum + 1 - minKeysNum);
+        leaf.setNodeSize(minKeys);
+        newLeaf.setNodeSize(maxKeys + 1 - minKeys);
         
         updateNode(leaf);
         updateNode(newLeaf);
@@ -186,7 +187,7 @@ public class BPTree<K> implements Serializable {
         // Si el padre del nodo es nulo, la hoja es root
         if(leaf.getParent() == null){
             
-            Node newRoot = new Node(false, keysNum, comparator);
+            Node newRoot = new Node(false, maxKeys, comparator);
             
             newRoot.setKey(0, (K) newLeaf.getKey(0));
             newRoot.setNodeSize(1);
@@ -235,7 +236,7 @@ public class BPTree<K> implements Serializable {
 
             updateNode(parent);
             
-            if(parent.getNodeSize() > keysNum)
+            if(parent.getNodeSize() > maxKeys)
                 split(parent.getPos());
         }
     }
@@ -248,13 +249,13 @@ public class BPTree<K> implements Serializable {
     private void split(Long nodePos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
         Node node = getNode(nodePos);
         
-        Node newNode = new Node(false, keysNum, comparator);
+        Node newNode = new Node(false, maxKeys, comparator);
         saveNode(newNode);
         
         // Dividir claves/valores del nodo interno
         int k = 0;
         int j = 0;
-        for(j = minKeysNum + 1; j < keysNum + 1; j++){
+        for(j = minKeys + 1; j < maxKeys + 1; j++){
             
             Node child = getNode(node.getChild(j));
             child.setParent(newNode.getPos());
@@ -273,17 +274,26 @@ public class BPTree<K> implements Serializable {
         newNode.setChild(k, child.getPos());
         updateNode(newNode);
         
-        node.setNodeSize(minKeysNum);
-        newNode.setNodeSize(keysNum - minKeysNum);
+        node.setNodeSize(minKeys);
+        newNode.setNodeSize(maxKeys - minKeys);
+        
+        newNode.setNext(node.next());
+        if(node.next() != null){
+            Node nextNode = getNode(node.getPos());
+            nextNode.setPrev(newNode.getPos());
+            updateNode(nextNode);
+        }
+        newNode.setPrev(node.getPos());
+        node.setNext(newNode.getPos());
         
         updateNode(node);
         updateNode(newNode);
         
         // Si el nodo es raiz
         if(node.getParent() == null){
-            Node newRoot = new Node(false, keysNum, comparator);
+            Node newRoot = new Node(false, maxKeys, comparator);
             
-            newRoot.setKey(0, (K) node.getKey(minKeysNum));
+            newRoot.setKey(0, (K) node.getKey(minKeys));
             newRoot.setNodeSize(1);
             
             saveNode(newRoot);
@@ -308,136 +318,323 @@ public class BPTree<K> implements Serializable {
             
             updateNode(newNode);
             
-            parent.insertChild(node.getKey(minKeysNum), newNode.getPos());
+            parent.insertChild(node.getKey(minKeys), newNode.getPos());
             
             updateNode(parent);
             
-            if(parent.getNodeSize() > keysNum)
+            if(parent.getNodeSize() > maxKeys)
                 split(parent.getPos());
         }
     }
     
-    public void del(K key){
-        // del(key, root);
+    public void del(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException{
+        delLeaf(key, root);
     }
     
-    /*
-    private void del(K key, Long node){
+    private void delLeaf(K key, Long nodePos)
+            throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException
+    {        
+        Node leaf = getNode(nodePos);
+        
+        int i = 0;
         // Comprobar si la clave existe
         if(search(key) == null)
             return;
-        // Buscar en qué hoja pertenece la clave a eliminar
-        Node leaf = node;
-        int i = 0;
+
+        // Buscar la hoja donde pertenece la clave a eliminar
         while(!leaf.isLeaf()){
             i = leaf.getNodeSize() - 1;
             while(i >= 0 && comparator.compare(key, (K) leaf.getKey(i)) < 0)
                 i--;
-            leaf = leaf.getChild(i + 1);
+            leaf = getNode(leaf.getChild(i + 1));
         }
         
-        Node parent = leaf.getParent();
+        Node parent = getNode(leaf.getParent());
         
+        // Eliminar clave.
         leaf.remove(key);
-        parent.setKey(i, leaf.getKey(0));
+        updateNode(leaf);
         
-        if(leaf.getNodeSize() >= keysNum/2)
+        parent.setKey(i, leaf.getKey(0));
+        updateNode(parent);
+        
+        // Si es raiz o cumple con el minimo de valores. Salir.
+        if(leaf.getNodeSize() >= minKeys || (Objects.equals(leaf.getPos(), root)))
             return;
         
         // Pedir prestado de hermano izquierdo
-        Node leftLeaf = leaf.prev();
-        if(leftLeaf.getParent() == leaf.getParent() && leftLeaf.getNodeSize() > keysNum/2){
-            int last = leftLeaf.getNodeSize() - 1;
-            leaf.insertValue(leftLeaf.getKey(last), leftLeaf.getValue(last));
-            leftLeaf.setNodeSize(leftLeaf.getNodeSize() - 1);
-            
+        Node leftNode = getNode(leaf.prev());
+        if(leftNode != null && Objects.equals(leftNode.getParent(), leaf.getParent()) && leftNode.getNodeSize() > minKeys){
+            int last = leftNode.getNodeSize() - 1;
+            leaf.insertValue(leftNode.getKey(last), leftNode.getValue(last));
+            updateNode(leaf);
+
+            leftNode.setNodeSize(leftNode.getNodeSize() - 1);
+            updateNode(leftNode);
+
             parent.setKey(i, leaf.getKey(0));
-            
+            updateNode(parent);
             return;
         }
         
         // Pedir prestado de hermano derecho
-        Node rightLeaf = leaf.next();
-        if(rightLeaf.getParent() == leaf.getParent() && rightLeaf.getNodeSize() > keysNum/2){
+        Node rightNode = getNode(leaf.next());
+        if(rightNode != null && Objects.equals(rightNode.getParent(), leaf.getParent()) && rightNode.getNodeSize() > minKeys){
             int first = 0;
-            leaf.insertValue(rightLeaf.getKey(first), rightLeaf.getValue(first));
-            rightLeaf.remove(rightLeaf.getKey(first));
-            
-            // Probablemente no necesario
-            // (probablemente a excepcion de un arbol de orden 2).
-            if(leaf.getNodeSize() == 1){
-                parent.remove(key);
-                parent.remove(leaf.getKey(first));
-                parent.insertChild(leaf.getKey(first), leaf);
-                parent.insertChild(rightLeaf.getKey(first), rightLeaf);
-            }else {
-                parent.setKey(i, rightLeaf.getKey(first));
-            }
-            
+            leaf.insertValue(rightNode.getKey(first), rightNode.getValue(first));
+            updateNode(leaf);
+
+            rightNode.remove(rightNode.getKey(first));
+            updateNode(rightNode);
+
+            parent.setKey(i, rightNode.getKey(first));
+            updateNode(parent);
+
             return;
         }
         
         // Merge con vecino izq
-        for(int j = 0; j < leaf.getNodeSize(); j++)
-            leftLeaf.insertValue(leaf.getKey(j), leaf.getValue(j));
-        parent.remove(leaf.getKey(0));
-        leftLeaf.setNodeSize(leftLeaf.getNodeSize() + leaf.getNodeSize());
+        if(leftNode != null && leftNode.getNodeSize() == minKeys){
+            for(int j = 0; j < leaf.getNodeSize(); j++)
+                leftNode.insertValue(leaf.getKey(j), leaf.getValue(j));
+            updateNode(leftNode);
+
+            Node nextNode = getNode(leaf.next());
+
+            if(nextNode != null){
+                leftNode.setNext(nextNode.getPos());
+                nextNode.setPrev(leftNode.getPos());
+
+                updateNode(nextNode);
+                updateNode(leftNode);
+            }else {
+                leftNode.setNext(null);
+                updateNode(leftNode);
+            }
+
+            delNode((K) parent.getKey(i), parent.getPos());
+
+            return;
+        }
         
-        leftLeaf.setNext(leaf.next());
-        leaf.next().setPrev(leftLeaf);
-        
-        if(parent.getNodeSize() < minKeysNum){}
-            //merge()
+        // Merge con vecino derecho
+        if(rightNode != null && rightNode.getNodeSize() == minKeys){
+            for(int j = 0; j < leaf.getNodeSize(); j++)
+                leaf.insertValue(rightNode.getKey(j), rightNode.getValue(j));
+            updateNode(leaf);
+            
+            Node nextNode = getNode(rightNode.next());
+            
+            if(nextNode != null){
+                leaf.setNext(nextNode.getPos());
+                nextNode.setPrev(leaf.getPos());
+                
+                updateNode(leaf);
+                updateNode(nextNode);
+            }else {
+                leaf.setNext(null);
+                updateNode(leaf);
+            }
+            
+            delNode((K) parent.getKey(i), parent.getPos());
+        }
     }
     
-    /*
-    private void merge(Node node, int i){
+    private void delNode(K key, Long nodePos)
+            throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException
+    {
+        Node node = getNode(nodePos);
+        Node parent = getNode(node.getParent());
+
+        int i = 0;
+        
+        // Buscar posicion de hijo en padre.
+        i = 0;
+        for(i = 1; i < parent.getNodeSize() + 1; i++){
+            if(Objects.equals(parent.getChild(i), node.getPos()))
+                break;
+        }
+        
+        // Eliminar clave.
+        node.remove(key);
+        
+        updateNode(node);
+        
+        // Nueva raiz.
+        if(node.getNodeSize() == 0){
+            Node child = getNode(node.getChild(0));
+            child.setParent(null);
+            updateNode(child);
+            
+            setRoot(child.getPos());
+            return;
+        }
+        
+        // Si es raiz o cumple con el minimo de valores. Salir.
+        if(node.getNodeSize() >= minKeys || (Objects.equals(node.getPos(), root)))
+            return;
+
         // Pedir prestado de hermano izquierdo
-        Node leftLeaf = leaf.prev();
-        if(leftLeaf.getParent() == leaf.getParent() && leftLeaf.getNodeSize() > keysNum/2){
-            int last = leftLeaf.getNodeSize() - 1;
-            leaf.insertValue(leftLeaf.getKey(last), leftLeaf.getValue(last));
-            leftLeaf.setNodeSize(leftLeaf.getNodeSize() - 1);
-            
-            parent.setKey(i, leaf.getKey(0));
-            
+        Node leftNode = getNode(node.prev());
+        if(leftNode != null && Objects.equals(leftNode.getParent(), node.getParent()) && leftNode.getNodeSize() > minKeys){
+            int last = leftNode.getNodeSize() - 1;
+                
+            // Correr 1 posicion las claves/valores
+            int k = node.getNodeSize() - 1;
+            while(k >= 0) {
+                node.setKey(k + 1, node.getKey(k));
+                node.setChild(k + 2, node.getChild(k + 1));
+                node.setChild(k + 1, node.getChild(k));
+                k--;
+            }
+            // Insertar nuevo valor
+            Node child = getNode(leftNode.getChild(last + 1));
+            node.setKey(0, parent.getKey(i - 1));
+            node.setChild(0, child.getPos());
+            node.setNodeSize(node.getNodeSize() + 1);
+            updateNode(node);
+
+            child.setParent(node.getPos());
+            updateNode(child);
+
+            leftNode.setNodeSize(leftNode.getNodeSize() - 1);  
+            updateNode(leftNode);
+
+            // Actualizar padre
+            parent.setKey(i - 1, node.getKey(0));
+            updateNode(parent);
             return;
         }
         
         // Pedir prestado de hermano derecho
-        Node rightLeaf = leaf.next();
-        if(rightLeaf.getParent() == leaf.getParent() && rightLeaf.getNodeSize() > keysNum/2){
+        Node rightNode = getNode(node.next());
+        if(rightNode != null && Objects.equals(rightNode.getParent(), node.getParent()) && rightNode.getNodeSize() > minKeys){
             int first = 0;
-            leaf.insertValue(rightLeaf.getKey(first), rightLeaf.getValue(first));
-            rightLeaf.remove(rightLeaf.getKey(first));
-            
-            // Probablemente no necesario
-            // (probablemente a excepcion de un arbol de orden 2).
-            if(leaf.getNodeSize() == 1){
-                parent.remove(key);
-                parent.remove(leaf.getKey(first));
-                parent.insertValue(leaf.getKey(first), leaf);
-                parent.insertValue(rightLeaf.getKey(first), rightLeaf);
-            }else {
-                parent.setKey(i, rightLeaf.getKey(first));
+            /*
+            - Buscar nodo "generador" desde el padre del nodo.
+            - Bajar esa clave a la última + 1 posicion.
+            - Tomar hijo del nodo vecino.
+            - Borrar primer hijo de nodo vecino y primera clave.
+            - Poner nueva clave en nodo generador del padre.
+                ejemplo:
+                      u
+                s t      w x y
+               1 2 3    4 5 6 7
+
+                Borrando t (se fusionan 2 y 3)
+                Caso actual:
+                    u
+                s       w x y
+               1 23    4 5 6 7
+                Balanceando arbol
+                      u 
+                s  u     w x y
+               1 23 4   4 5 6 7
+
+                     u 
+                s  u    x y
+               1 23 4  5 6 7
+
+                      x 
+                s  u    x y
+               1 23 4  5 6 7
+
+                Listo!
+            */
+
+            // Insertar nuevo valor
+            Node child = getNode(rightNode.getChild(0));
+            node.setKey(node.getNodeSize(), parent.getKey(i + 1));
+            node.setChild(node.getNodeSize() + 1, child.getPos());
+            node.setNodeSize(node.getNodeSize() + 1);
+            updateNode(node);
+
+            child.setParent(node.getPos());
+            updateNode(child);
+
+            // Correr 1 posicion las claves/valores
+            int k = 0;
+            while(k < rightNode.getNodeSize()) {
+                rightNode.setKey(k, rightNode.getKey(k + 1));
+                rightNode.setChild(k, rightNode.getChild(k + 1));
+                k++;
             }
             
+            rightNode.setNodeSize(rightNode.getNodeSize() - 1);  
+            updateNode(rightNode);
+
+            // Actualizar padre
+            parent.setKey(i + 1, rightNode.getKey(0));
+            updateNode(parent);
+
             return;
         }
         
         // Merge con vecino izq
-        for(int j = 0; j < leaf.getNodeSize(); j++)
-            leftLeaf.insertValue(leaf.getKey(j), leaf.getValue(j));
-        parent.remove(leaf.getKey(0));
-        leftLeaf.setNodeSize(leftLeaf.getNodeSize() + leaf.getNodeSize());
+        if(leftNode != null && Objects.equals(leftNode.getParent(), node.getParent()) && leftNode.getNodeSize() == minKeys){
+            /*
+            - Buscar posicion de hijo en padre
+            - Insertar i-ésima key de padre en vecino izq.
+            - Vecino izq absorbe nodo.
+            - Reparar prev y next de los nodos.
+            - Eliminar i-ésima key del padre
+            - Si al eliminar key no queda nada. Hacer nueva root a hijo
+            */
+            
+            leftNode.setKey(leftNode.getNodeSize(), parent.getKey(i -1));
+            leftNode.setChild(leftNode.getNodeSize() + 1, node.getChild(0));
+            
+            int k = leftNode.getNodeSize() + 1;
+            for(int j = 0; j < node.getNodeSize(); j++){
+                leftNode.setKey(k, node.getKey(j));
+                leftNode.setChild(k + 1, node.getChild(j + 1));
+                k++;
+            }
+            leftNode.setNodeSize(maxKeys);
+            
+            updateNode(leftNode);
+            
+            leftNode.setNext(node.next());
+            if(node.next() != null){
+                Node leafNext = getNode(node.next()); 
+                leafNext.setPrev(leftNode.getPos());
+                updateNode(leafNext);
+            }
+            updateNode(leftNode);
+            
+            delNode((K) parent.getKey(i - 1), parent.getPos());
+            
+            return;
+        }
         
-        leftLeaf.setNext(leaf.next());
-        leaf.next().setPrev(leftLeaf);
+        // Merge con vecino derecho
+        if(rightNode != null && Objects.equals(rightNode.getParent(), node.getParent()) && rightNode.getNodeSize() == minKeys){
+
+            node.setKey(node.getNodeSize(), parent.getKey(i + 1));
+            node.setChild(node.getNodeSize() + 1, rightNode.getChild(0));
+            
+            int k = node.getNodeSize() + 1;
+            for(int j = 0; j < rightNode.getNodeSize(); j++){
+                node.setKey(k, rightNode.getKey(j));
+                node.setChild(k + 1, rightNode.getChild(j + 1));
+                k++;
+            }
+            node.setNodeSize(maxKeys);
+            
+            updateNode(node);
+            
+            node.setNext(rightNode.next());
+            if(rightNode.next() != null){
+                Node leafNext = getNode(rightNode.next()); 
+                leafNext.setPrev(node.getPos());
+                updateNode(leafNext);
+            }
+            updateNode(node);
+            
+            delNode((K) parent.getKey(i + 1), parent.getPos());
+        }
         
-        if(parent.getNodeSize() < minKeysNum)
-            merge()
     }
-    */
     
     /**
      * 
@@ -581,7 +778,7 @@ public class BPTree<K> implements Serializable {
         RandomAccessFile raf = null;
         try{
             raf = new RandomAccessFile(PATH, "rw");
-            
+            newNode.setPos(pos);
             obj = serialize(newNode);
             
             if(obj.length > OBJ_SIZE)

@@ -141,7 +141,7 @@ public final class Node<K> implements Serializable {
     public void remove(K key){
         int i;
         for(i = 0; i < getNodeSize(); i++){
-            if(keys[i] == key)
+            if(comparator.compare(keys[i], key) == 0)
                 break;
         }
         

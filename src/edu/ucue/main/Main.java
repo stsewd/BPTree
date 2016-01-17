@@ -5,11 +5,14 @@ package edu.ucue.main;
 
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
+import edu.ucue.bptree.ObjectSizeException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -130,10 +133,12 @@ public class Main {
         
         /*
         ArrayList<Integer> n = new ArrayList();
-        
-        for(int i = 0; i < 1000; i++)
+        for(int i = 0; i < 10; i++)
             n.add(i);
         Collections.shuffle(n);
+        */
+        
+        int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
         
         BPTree<Integer> tree = null;
         
@@ -143,18 +148,37 @@ public class Main {
             System.out.println(ex.getMessage());
         }
         
-        System.out.println(n);
-        for(int i = 0; i < 1000; i++)
-            try {
-                tree.add(n.get(i), 0L);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        
-        System.out.println(tree);
-        
+        /*
         try {
+            tree.add(3, 0L);
+            tree.add(5, 0L);
+            tree.add(8, 0L);
+            System.out.println(tree);
+        } catch (Exception ex) {
+            System.out.println("Error " + ex.getMessage());
+        }
+        */
+        
+        
+        //System.out.println(n);
+        System.out.println("5, 3, 8, 0, 2, 6, 7, 9, 4, 1");
+        try {
+            for(int i = 0; i < n.length; i++)
+                tree.add(n[i], 0L);
+            System.out.println(tree);
             tree.showAll();
+            System.out.println();
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex);
+        }
+        
+        /*
+        try{
+            tree.del(3);
+            tree.del(4);
+            System.out.println(tree);
+            tree.showAll();
+        System.out.println();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

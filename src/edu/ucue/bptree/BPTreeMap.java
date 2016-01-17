@@ -23,9 +23,10 @@ public class BPTreeMap<K, V> implements Serializable {
     private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
     private BPTree<K> tree; // Árbol B+, tabla de índices.
+    private static final int NODO_SIZE = 1500; // Tamaño predefinido para cada nodo.
     
     private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException, FileNotFoundException, ObjectSizeException {
-        tree = BPTree.getTree(keysNumber, comparator, treePath, 1500); // 1500 es el tamño del nodo.
+        tree = BPTree.getTree(keysNumber, comparator, treePath, NODO_SIZE);
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
     }
@@ -188,9 +189,13 @@ public class BPTreeMap<K, V> implements Serializable {
      * (sólo se elimina de la tabla de índices, no
      * de la tabla de valores).
      * @param key 
+     * @throws java.io.IOException 
+     * @throws java.io.FileNotFoundException 
+     * @throws java.lang.ClassNotFoundException 
+     * @throws edu.ucue.bptree.ObjectSizeException 
      */
-    public void remove(K key) {
-         throw new UnsupportedOperationException("Not supported yet.");
+    public void remove(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
+        tree.del(key);
     }
     
     /**
