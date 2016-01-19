@@ -27,7 +27,8 @@ public class Main {
     public static void main(String[] args) {
         
         /********************************************************************
-         * Uso del árbol B+ con archivos (tabla de índices y valores).
+         * Uso del árbol B+ con archivos (tabla de índices primaria/secundaria
+         * y tabla de valores).
         *********************************************************************/
         
         // Objetos de prueba.
@@ -55,6 +56,8 @@ public class Main {
         
         // Ruta donde se manejara tabla de índices.
         String treePath = "data/persons_lastname_index.dat";
+        
+        // Ruta donde se manejara la tabla de indice secundario.
         String treePathSec = "data/persons_name_index.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.

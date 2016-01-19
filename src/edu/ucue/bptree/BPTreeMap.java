@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -155,23 +154,6 @@ public class BPTreeMap<K, V> implements Serializable {
     }
     
     /**
-     * Agrega clave y posicion en tabla de indices,
-     * la tabla de valores no se ve modificada,
-     * usar con cuidado.
-     * @param key 
-     * @param pos 
-     * @throws java.io.IOException 
-     * @throws java.io.FileNotFoundException 
-     * @throws java.lang.ClassNotFoundException 
-     * @throws edu.ucue.bptree.ObjectSizeException 
-     */
-    /*
-    public void put(K key, Long pos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException{
-        tree.add(key, pos);
-    }
-    */
-
-    /**
      * Retorna una colección con todos los elementos
      * almacenados en el árbol.
      * @return 
@@ -229,7 +211,7 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
      */
-    public Long getPos(K key) throws IOException, FileNotFoundException, ClassNotFoundException{
+    private Long getPos(K key) throws IOException, FileNotFoundException, ClassNotFoundException{
         return tree.search(key);
     }
 
