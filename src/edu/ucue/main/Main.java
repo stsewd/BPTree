@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,8 +37,8 @@ public class Main {
         
         // Obtener tamaño del objeto serializado
         // (113 en el caso de los objetos de prueba creados).
-        // * Asegurarse que el tamaño de todos los objetos
-        // el mismo para todos.
+        // * Si el objeto varía con el tiempo, escoger un tamaño
+        // límite.
         /*
         try {
             byte[] b;

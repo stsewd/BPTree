@@ -28,7 +28,7 @@ public class BPTree<K> implements Serializable {
     private final int minKeys; // Mínimo de claves que puede tener un nodo (excepto root)
     private final Comparator<K> comparator; // Comparador de claves
     private final File PATH; // Ruta donde se almacenara la tabla de indices
-    private final int OBJ_SIZE; // Tamaño max reservado para cada nodo.
+    private final int NODE_SIZE; // Tamaño max reservado para cada nodo.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del nodo.
     
     /**
@@ -47,7 +47,7 @@ public class BPTree<K> implements Serializable {
         this.maxKeys = order - 1;
         this.comparator = comparator;
         this.minKeys = (int) Math.ceil(order/2.0) - 1;
-        this.OBJ_SIZE = objSize;
+        this.NODE_SIZE = objSize;
         this.PATH = new File(path);
         
         setRoot(root);
@@ -411,7 +411,7 @@ public class BPTree<K> implements Serializable {
         }
         
         // Merge con vecino izq
-        if(leftNode != null && leftNode.getNodeSize() == minKeys){
+        if(leftNode != null && Objects.equals(leftNode.getParent(), leaf.getParent()) && leftNode.getNodeSize() == minKeys){
             for(int j = 0; j < leaf.getNodeSize(); j++)
                 leftNode.insertValue(leaf.getKey(j), leaf.getValue(j));
             updateNode(leftNode);
@@ -435,7 +435,7 @@ public class BPTree<K> implements Serializable {
         }
         
         // Merge con vecino derecho
-        if(rightNode != null && rightNode.getNodeSize() == minKeys){
+        if(rightNode != null && Objects.equals(rightNode.getParent(), leaf.getParent()) && rightNode.getNodeSize() == minKeys){
             for(int j = 0; j < rightNode.getNodeSize(); j++)
                 leaf.insertValue(rightNode.getKey(j), rightNode.getValue(j));
             updateNode(leaf);
@@ -816,7 +816,7 @@ public class BPTree<K> implements Serializable {
             
             obj = serialize(node);
             
-            if(obj.length > OBJ_SIZE)
+            if(obj.length > NODE_SIZE)
                 throw new ObjectSizeException(PATH);
             
             raf.seek(pos);
@@ -824,7 +824,7 @@ public class BPTree<K> implements Serializable {
             raf.write(obj);
             
             // Llenar de bytes
-            rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
+            rest = new byte[NODE_SIZE - obj.length + EXTRA_BYTES];
             raf.write(rest);
         } finally {
             raf.close();
@@ -849,7 +849,7 @@ public class BPTree<K> implements Serializable {
             newNode.setPos(pos);
             obj = serialize(newNode);
             
-            if(obj.length > OBJ_SIZE)
+            if(obj.length > NODE_SIZE)
                 throw new ObjectSizeException(PATH);
                 
             raf.seek(pos);
@@ -857,7 +857,7 @@ public class BPTree<K> implements Serializable {
             raf.write(obj);
             
             // Llenar de bytes
-            rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
+            rest = new byte[NODE_SIZE - obj.length + EXTRA_BYTES];
             raf.write(rest);
             
         } finally {

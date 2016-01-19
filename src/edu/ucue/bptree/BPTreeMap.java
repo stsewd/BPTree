@@ -226,12 +226,12 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws edu.ucue.bptree.ObjectSizeException 
      */
     public void remove(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
+        V obj = getObject(tree.search(key));
         tree.del(key);
-        
         // Borrar claves en arboles secundarios.
         for(int i = 0; i < secTreeIndex.size(); i++){
             IndexGenerator ig = indexGenerators.get(i);
-            secTreeIndex.get(i).del(key);
+            secTreeIndex.get(i).del(ig.getKey(obj));
         }
     }
     
