@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  *
@@ -22,13 +23,23 @@ public class BPTreeMap<K, V> implements Serializable {
     private final File PATH; // Ruta donde se almacenará la tabla de valores.
     private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
-    private BPTree<K> tree; // Árbol B+, tabla de índices.
+    private final int KEYS_NUMBER;
     private static final int NODO_SIZE = 1500; // Tamaño predefinido para cada nodo.
+    private BPTree<K> tree; // Árbol B+, tabla de índices.
     
-    private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize) throws IOException, FileNotFoundException, ObjectSizeException {
-        tree = BPTree.getTree(keysNumber, comparator, treePath, NODO_SIZE);
+    private List<BPTree> secTreeIndex; // Lista de árboles que contienen indices secundarios.
+    private List<IndexGenerator<V, Object>> indexGenerators; // Lista de generadores de indices secundarios.
+    
+    private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
+            throws IOException, FileNotFoundException, ObjectSizeException
+    {
+        KEYS_NUMBER = keysNumber;
+        tree = BPTree.getTree(keysNumber, comparator, treePath, nodeSize);
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
+        
+        secTreeIndex = new ArrayList<>();
+        indexGenerators = new ArrayList<>();
     }
     
     /**
@@ -47,8 +58,20 @@ public class BPTreeMap<K, V> implements Serializable {
     public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
             throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException
     {
-        
-        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize);
+        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize, NODO_SIZE);
+    }
+    
+    /*
+    necesito:
+    - Generador de indices
+    - ruta del nuevo arbol de indices
+    - Almacenar en memoria arbol creado a partir de ruta y generador.
+    */
+    public void addSecIndex(String treePath, IndexGenerator indexGenerator)
+            throws IOException, FileNotFoundException, ObjectSizeException
+    {
+        secTreeIndex.add(BPTree.getTree(KEYS_NUMBER, indexGenerator.getComparator(), treePath, NODO_SIZE));
+        indexGenerators.add(indexGenerator);
     }
     
     /**
@@ -108,7 +131,7 @@ public class BPTreeMap<K, V> implements Serializable {
             obj = serialize(value);
             
             if(obj.length > OBJ_SIZE)
-                throw new ObjectSizeException();
+                throw new ObjectSizeException(PATH);
             
             pos = ram.length();
             ram.seek(pos);
@@ -123,6 +146,12 @@ public class BPTreeMap<K, V> implements Serializable {
         }
         
         tree.add(key, pos);
+        
+        // Agregar claves en arboles secundarios.
+        for(int i = 0; i < secTreeIndex.size(); i++){
+            IndexGenerator ig = indexGenerators.get(i);
+            secTreeIndex.get(i).add(ig.getKey(value), pos);
+        }
     }
     
     /**
@@ -136,9 +165,11 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws java.lang.ClassNotFoundException 
      * @throws edu.ucue.bptree.ObjectSizeException 
      */
+    /*
     public void put(K key, Long pos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException{
         tree.add(key, pos);
     }
+    */
 
     /**
      * Retorna una colección con todos los elementos
@@ -151,6 +182,24 @@ public class BPTreeMap<K, V> implements Serializable {
     public Collection<V> values() throws IOException, FileNotFoundException, ClassNotFoundException {
         ArrayList values = new ArrayList();
         for(Long pos : tree.values()){
+            values.add(getObject(pos));
+        }
+        return values;
+    }
+    
+    /**
+     * Retorna una coleccion con todos los elementos
+     * ordenados de acuerdo al arbol secundario especificado.
+     * @param indexSecTree
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException 
+     */
+    public Collection<V> valuesOf(int indexSecTree) throws IOException, FileNotFoundException, ClassNotFoundException {
+        ArrayList values = new ArrayList();
+        BPTree<Object> t = secTreeIndex.get(indexSecTree);
+        for(Long pos : t.values()){
             values.add(getObject(pos));
         }
         return values;
@@ -196,6 +245,12 @@ public class BPTreeMap<K, V> implements Serializable {
      */
     public void remove(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
         tree.del(key);
+        
+        // Borrar claves en arboles secundarios.
+        for(int i = 0; i < secTreeIndex.size(); i++){
+            IndexGenerator ig = indexGenerators.get(i);
+            secTreeIndex.get(i).del(key);
+        }
     }
     
     /**
@@ -205,19 +260,18 @@ public class BPTreeMap<K, V> implements Serializable {
      * @return 
      */
     private V getObject(long pos) throws FileNotFoundException, IOException, ClassNotFoundException {
-        RandomAccessFile ram = null;
+        RandomAccessFile raf = null;
         byte[] objByte;
         V obj = null;
         try {
-            ram = new RandomAccessFile(PATH, "rw");
+            raf = new RandomAccessFile(PATH, "rw");
             
-            ram.seek(pos);
-            objByte = new byte[ram.readInt()];
-            ram.read(objByte);
-            
+            raf.seek(pos);
+            objByte = new byte[raf.readInt()];
+            raf.read(objByte);
             obj = (V) deserialize(objByte);
         } finally {
-            ram.close();
+            raf.close();
         }
         
         return obj;
@@ -250,46 +304,38 @@ public class BPTreeMap<K, V> implements Serializable {
     }
     
     /**
-     * Guarda el árbol en la ruta dada.
-     * @param treePath 
-     * @throws java.io.FileNotFoundException 
+     * Actualiza un objeto de la tabla de valores.
+     * @param key
+     * @param newValue
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws ObjectSizeException 
      */
-    public void save(String treePath) throws FileNotFoundException, IOException {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(treePath);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            
-            oos.writeObject(this);
-        } finally {
-            fos.close();
-        }
-    }
-    
     public void update(K key, V newValue) throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException {
-        RandomAccessFile ram = null;
+        RandomAccessFile raf = null;
         byte[] obj;
         byte[] rest;
         long pos = 0;
         
         try {
-            ram = new RandomAccessFile(PATH, "rw");
+            raf = new RandomAccessFile(PATH, "rw");
             
             obj = serialize(newValue);
             
             if(obj.length > OBJ_SIZE)
-                throw new ObjectSizeException();
+                throw new ObjectSizeException(PATH);
             
             pos = getPos(key);
-            ram.seek(pos);
-            ram.writeInt(obj.length);
-            ram.write(obj);
+            raf.seek(pos);
+            raf.writeInt(obj.length);
+            raf.write(obj);
             
             // Llenar de bytes
             rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
-            ram.write(rest);
+            raf.write(rest);
         } finally {
-            ram.close();
+            raf.close();
         }
     }
     

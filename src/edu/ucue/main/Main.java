@@ -5,6 +5,7 @@ package edu.ucue.main;
 
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
+import edu.ucue.bptree.IndexGenerator;
 import edu.ucue.bptree.ObjectSizeException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,10 +31,10 @@ public class Main {
         *********************************************************************/
         
         // Objetos de prueba.
-        Person p1 = new Person("0000", "Perez000", 25);
-        Person p2 = new Person("0001", "Perez001", 33);
-        Person p3 = new Person("0002", "Perez002", 33);
-        Person p4 = new Person("0003", "Perez003", 33);
+        Person p1 = new Person("0003", "Perez000", 25);
+        Person p2 = new Person("0002", "Perez001", 33);
+        Person p3 = new Person("0001", "Perez002", 33);
+        Person p4 = new Person("0000", "Perez003", 33);
         
         // Obtener tamaño del objeto serializado
         // (113 en el caso de los objetos de prueba creados).
@@ -54,19 +55,21 @@ public class Main {
         
         // Ruta donde se manejara tabla de índices.
         String treePath = "data/persons_lastname_index.dat";
+        String treePathSec = "data/persons_name_index.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
-        /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
-            bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 113);
+            bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 300);
+            
+            // Agregar tabla de indice secundaria
+            bpTreeMap.addSecIndex(treePathSec, new NombreGenerator());
+            
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        */
         
         // Agregamos los objetos al arbol
-        /*
         try {
             bpTreeMap.put(p3.lastName, p3);
             bpTreeMap.put(p4.lastName, p4);
@@ -75,19 +78,20 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        */
         
         // Recuperamos
-        /*
         try {
-            // System.out.println(bpTreeMap.get(p4.lastName));
-            // System.out.println(bpTreeMap.get(p1.lastName));
+            System.out.println("De tabla de indice primaria.");
             for(Person p : bpTreeMap.values())
                 System.out.println(p);
+            
+            System.out.println("De tabla de indice sec.");
+            for(Person p : bpTreeMap.valuesOf(0))
+                System.out.println(p);
+            
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        */
         
         /*********************************************************************
          *  Uso de árbol B+ solo con archivo de indice.
@@ -138,6 +142,7 @@ public class Main {
         Collections.shuffle(n);
         */
         
+        /*
         int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
         
         BPTree<Integer> tree = null;
@@ -147,6 +152,7 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        */
         
         /*
         try {
@@ -159,7 +165,7 @@ public class Main {
         }
         */
         
-        
+        /*
         //System.out.println(n);
         System.out.println("5, 3, 8, 0, 2, 6, 7, 9, 4, 1");
         try {
@@ -196,6 +202,7 @@ public class Main {
         } catch (Exception ex) {
             System.out.println("Error: " + ex);
         }
+        */
         
         /*
         try{

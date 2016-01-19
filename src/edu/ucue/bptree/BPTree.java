@@ -53,6 +53,17 @@ public class BPTree<K> implements Serializable {
         setRoot(root);
     }
     
+    /**
+     * Retorna un árbol desde un archivo, si no existe crea uno nuevo vacío.
+     * @param keysNumber
+     * @param comparator
+     * @param path
+     * @param objSize
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ObjectSizeException 
+     */
     public static BPTree getTree(int keysNumber, Comparator comparator, String path, int objSize)
             throws FileNotFoundException, IOException, ObjectSizeException
     {
@@ -79,7 +90,12 @@ public class BPTree<K> implements Serializable {
         return tree;
     }
         
-
+    /**
+     * Cambia la raíz actual del árbol por una nueva.
+     * @param root
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     private void setRoot(Long root) throws FileNotFoundException, IOException {
         RandomAccessFile raf = null;
         try {
@@ -327,11 +343,15 @@ public class BPTree<K> implements Serializable {
         }
     }
     
-    public void del(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException{
-        delLeaf(key, root);
-    }
-    
-    private void delLeaf(K key, Long nodePos)
+    /**
+     * Elimina una clave de la hoja del arbol.
+     * @param key
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException
+     * @throws ObjectSizeException 
+     */
+    public void del(K key)
             throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException
     {        
         // Comprobar si la clave existe
@@ -437,6 +457,15 @@ public class BPTree<K> implements Serializable {
         }
     }
     
+    /**
+     * Elimina una clave de un nodo interno recursivamente.
+     * @param key
+     * @param nodePos
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException
+     * @throws ObjectSizeException 
+     */
     private void delNode(K key, Long nodePos)
             throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException
     {
@@ -627,6 +656,14 @@ public class BPTree<K> implements Serializable {
         
     }
     
+    /**
+     * Retorna la posicion donde pertenece un nodo como hijo de su padre.
+     * @param node
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException 
+     */
     private int searchInParent(Node node) throws IOException, FileNotFoundException, ClassNotFoundException{
         Node parent = getNode(node.getParent());
         int i = 0;
@@ -692,6 +729,12 @@ public class BPTree<K> implements Serializable {
         return str;
     }
     
+    /**
+     * Muestra todos los elementos de las hojas.
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException 
+     */
     public void showAll() throws IOException, FileNotFoundException, ClassNotFoundException{
         // Buscar primera hoja
         Node leaf = getNode(root);
@@ -704,6 +747,13 @@ public class BPTree<K> implements Serializable {
         }
     }
     
+    /**
+     * Retorna una coleccion de todos los elementos de las hojas.
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ClassNotFoundException 
+     */
     public Collection<Long> values() throws IOException, FileNotFoundException, ClassNotFoundException{
         ArrayList<Long> values = new ArrayList();
         
@@ -746,6 +796,13 @@ public class BPTree<K> implements Serializable {
         return is.readObject();
     }
     
+    /**
+     * Guarda un nodo al ultimo del archivo.
+     * @param node
+     * @return
+     * @throws IOException
+     * @throws ObjectSizeException 
+     */
     private Long saveNode(Node node) throws IOException, ObjectSizeException{
         byte[] obj;
         byte[] rest;
@@ -760,7 +817,7 @@ public class BPTree<K> implements Serializable {
             obj = serialize(node);
             
             if(obj.length > OBJ_SIZE)
-                throw new ObjectSizeException();
+                throw new ObjectSizeException(PATH);
             
             raf.seek(pos);
             raf.writeInt(obj.length);
@@ -775,6 +832,14 @@ public class BPTree<K> implements Serializable {
         return pos;
     }
     
+    /**
+     * Actualiza un nodo reemplazando el contenido existente en la posicion pos.
+     * @param newNode
+     * @param pos
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ObjectSizeException 
+     */
     private void updateNode(Node newNode, Long pos) throws FileNotFoundException, IOException, ObjectSizeException{
         byte[] obj;
         byte[] rest;
@@ -785,7 +850,7 @@ public class BPTree<K> implements Serializable {
             obj = serialize(newNode);
             
             if(obj.length > OBJ_SIZE)
-                throw new ObjectSizeException();
+                throw new ObjectSizeException(PATH);
                 
             raf.seek(pos);
             raf.writeInt(obj.length);
@@ -804,6 +869,14 @@ public class BPTree<K> implements Serializable {
         updateNode(node, node.getPos());
     }
     
+    /**
+     * Obtiene el nodo almacenado en las posicion pos del archivo.
+     * @param pos
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
     private Node getNode(Long pos) throws FileNotFoundException, IOException, ClassNotFoundException {
         if(pos == null)
             return null;

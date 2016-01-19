@@ -5,14 +5,16 @@
  */
 package edu.ucue.bptree;
 
+import java.io.File;
+
 /**
  *
  * @author Santos Gallegos
  */
 public class ObjectSizeException extends Exception {
 
-    public ObjectSizeException() {
-        super("Tamaño de objeto mayor al asignado.");
+    public ObjectSizeException(File path) {
+        super("Tamaño de objeto mayor al asignado. " + path);
     }
     
 }
