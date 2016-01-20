@@ -23,7 +23,7 @@ public class BPTreeMap<K, V> implements Serializable {
     private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
     private final int KEYS_NUMBER;
-    private static final int NODO_SIZE = 1500; // Tamaño predefinido para cada nodo.
+    private static final int NODE_SIZE = 1500; // Tamaño predefinido para cada nodo.
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
     private List<BPTree> secTreeIndex; // Lista de árboles que contienen indices secundarios.
@@ -49,15 +49,16 @@ public class BPTreeMap<K, V> implements Serializable {
      * @param dataPath
      * @param treePath
      * @param objSize
+     * @param nodeSize
      * @return 
      * @throws java.io.FileNotFoundException 
      * @throws java.lang.ClassNotFoundException 
      * @throws edu.ucue.bptree.ObjectSizeException 
      */
-    public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize)
+    public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
             throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException
     {
-        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize, NODO_SIZE);
+        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize, nodeSize);
     }
     
     /*
@@ -66,10 +67,10 @@ public class BPTreeMap<K, V> implements Serializable {
     - ruta del nuevo arbol de indices
     - Almacenar en memoria arbol creado a partir de ruta y generador.
     */
-    public void addSecIndex(String treePath, IndexGenerator indexGenerator)
+    public void addSecIndex(String treePath, IndexGenerator indexGenerator, int nodeSize)
             throws IOException, FileNotFoundException, ObjectSizeException
     {
-        secTreeIndex.add(BPTree.getTree(KEYS_NUMBER, indexGenerator.getComparator(), treePath, NODO_SIZE));
+        secTreeIndex.add(BPTree.getTree(KEYS_NUMBER, indexGenerator.getComparator(), treePath, nodeSize));
         indexGenerators.add(indexGenerator);
     }
     
@@ -299,6 +300,7 @@ public class BPTreeMap<K, V> implements Serializable {
         byte[] obj;
         byte[] rest;
         long pos = 0;
+        V oldObj = getObject(tree.search(key));
         
         try {
             raf = new RandomAccessFile(PATH, "rw");
@@ -316,6 +318,13 @@ public class BPTreeMap<K, V> implements Serializable {
             // Llenar de bytes
             rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
             raf.write(rest);
+            
+            // Eliminar clave secundaria y volver a añadirla con nuevo valor.
+            for(int i = 0; i < secTreeIndex.size(); i++){
+                IndexGenerator ig = indexGenerators.get(i);
+                secTreeIndex.get(i).del(ig.getKey(oldObj));
+                secTreeIndex.get(i).add(ig.getKey(obj), pos);
+            }
         } finally {
             raf.close();
         }

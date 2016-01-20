@@ -180,9 +180,16 @@ public class Main {
             tree.del(0);
             tree.del(1);
             
-            tree.del(12);            
-            tree.del(11);            
+            tree.del(12);
+            tree.del(11);
             tree.del(10);
+            tree.del(5);
+            tree.del(6);
+            tree.del(7);
+            tree.del(9);
+            tree.del(8);
+            // Revisar mezcla con hijo izq
+            System.out.println("Boorado hasta el 8");
             System.out.println(tree);
             tree.showAll();
             System.out.println();

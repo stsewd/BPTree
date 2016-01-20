@@ -36,18 +36,18 @@ public class BPTree<K> implements Serializable {
      * @param order Número máximo de claves.
      * @param comparator Objeto necesario para comparar las claves.
      * @param path
-     * @param objSize
+     * @param nodeSize
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    private BPTree(int order, Comparator<K> comparator, String path, int objSize, Long root)
+    private BPTree(int order, Comparator<K> comparator, String path, int nodeSize, Long root)
             throws FileNotFoundException, IOException
     {
         
         this.maxKeys = order - 1;
         this.comparator = comparator;
         this.minKeys = (int) Math.ceil(order/2.0) - 1;
-        this.NODE_SIZE = objSize;
+        this.NODE_SIZE = nodeSize;
         this.PATH = new File(path);
         
         setRoot(root);
@@ -58,20 +58,20 @@ public class BPTree<K> implements Serializable {
      * @param keysNumber
      * @param comparator
      * @param path
-     * @param objSize
+     * @param nodeSize
      * @return
      * @throws FileNotFoundException
      * @throws IOException
      * @throws ObjectSizeException 
      */
-    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int objSize)
+    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int nodeSize)
             throws FileNotFoundException, IOException, ObjectSizeException
     {
         BPTree tree = null;
         
         File treePath = new File(path);
         if(!treePath.exists()){
-            tree = new BPTree(keysNumber, comparator, path, objSize, 8L);
+            tree = new BPTree(keysNumber, comparator, path, nodeSize, 8L);
             tree.saveNode(new Node(true, keysNumber, comparator));
             return tree;
         }
@@ -82,7 +82,7 @@ public class BPTree<K> implements Serializable {
             raf = new RandomAccessFile(treePath, "rw");
             raf.seek(0);
             Long root = raf.readLong();
-            tree = new BPTree(keysNumber, comparator, path, objSize, root);
+            tree = new BPTree(keysNumber, comparator, path, nodeSize, root);
         } finally {
             raf.close();
         }
@@ -498,7 +498,7 @@ public class BPTree<K> implements Serializable {
         Node leftNode = getNode(node.prev());
         if(leftNode != null && Objects.equals(leftNode.getParent(), node.getParent()) && leftNode.getNodeSize() > minKeys){
             int last = leftNode.getNodeSize() - 1;
-                
+            
             // Correr 1 posicion las claves/valores
             int k = node.getNodeSize() - 1;
             while(k >= 0) {
@@ -564,14 +564,18 @@ public class BPTree<K> implements Serializable {
 
             // Insertar nuevo valor
             Node child = getNode(rightNode.getChild(0));
-            node.setKey(node.getNodeSize(), parent.getKey(i + 1));
+            node.setKey(node.getNodeSize(), parent.getKey(i));
             node.setChild(node.getNodeSize() + 1, child.getPos());
             node.setNodeSize(node.getNodeSize() + 1);
             updateNode(node);
 
             child.setParent(node.getPos());
             updateNode(child);
-
+            
+            // Actualizar padre
+            parent.setKey(i, rightNode.getKey(0));
+            updateNode(parent);
+            
             // Correr 1 posicion las claves/valores
             int k = 0;
             while(k < rightNode.getNodeSize()) {
@@ -582,10 +586,6 @@ public class BPTree<K> implements Serializable {
             
             rightNode.setNodeSize(rightNode.getNodeSize() - 1);  
             updateNode(rightNode);
-
-            // Actualizar padre
-            parent.setKey(i + 1, rightNode.getKey(0));
-            updateNode(parent);
 
             return;
         }
