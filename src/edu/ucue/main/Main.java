@@ -59,6 +59,7 @@ public class Main {
         String treePathSec = "data/persons_name_index.dat";
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
+        /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
             bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 300);
@@ -69,7 +70,9 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        */
         
+        /*
         // Agregamos los objetos al arbol
         try {
             bpTreeMap.put(p3.lastName, p3);
@@ -93,6 +96,7 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        */
         
         /*********************************************************************
          *  Uso de árbol B+ solo con archivo de indice.
@@ -143,7 +147,6 @@ public class Main {
         Collections.shuffle(n);
         */
         
-        /*
         int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
         
         BPTree<Integer> tree = null;
@@ -153,18 +156,39 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        */
         
-        /*
         try {
             tree.add(3, 0L);
             tree.add(5, 0L);
             tree.add(8, 0L);
+            tree.add(0, 0L);
+            tree.add(2, 0L);
+            tree.add(6, 0L);
+            tree.add(7, 0L);
+            tree.add(9, 0L);
+            tree.add(4, 0L);
+            tree.add(1, 0L);
+            tree.add(10, 0L);
+            tree.add(11, 0L);
+            tree.add(12, 0L);
             System.out.println(tree);
+            tree.showAll();
+            System.out.println();
+            tree.del(3);
+            tree.del(4);
+            tree.del(2);
+            tree.del(0);
+            tree.del(1);
+            
+            tree.del(12);            
+            tree.del(11);            
+            tree.del(10);
+            System.out.println(tree);
+            tree.showAll();
+            System.out.println();
         } catch (Exception ex) {
-            System.out.println("Error " + ex.getMessage());
+            System.out.println("Error " + ex);
         }
-        */
         
         /*
         //System.out.println(n);

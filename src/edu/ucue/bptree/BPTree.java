@@ -592,22 +592,25 @@ public class BPTree<K> implements Serializable {
         
         // Merge con vecino izq
         if(leftNode != null && Objects.equals(leftNode.getParent(), node.getParent()) && leftNode.getNodeSize() == minKeys){
-            /*
-            - Buscar posicion de hijo en padre
-            - Insertar i-ésima key de padre en vecino izq.
-            - Vecino izq absorbe nodo.
-            - Reparar prev y next de los nodos.
-            - Eliminar i-ésima key del padre
-            - Si al eliminar key no queda nada. Hacer nueva root a hijo
-            */
+            Node child;
             
-            leftNode.setKey(leftNode.getNodeSize(), parent.getKey(i -1));
-            leftNode.setChild(leftNode.getNodeSize() + 1, node.getChild(0));
+            leftNode.setKey(leftNode.getNodeSize(), parent.getKey(i - 1));
+            
+            child = getNode(node.getChild(0));
+            leftNode.setChild(leftNode.getNodeSize() + 1, child.getPos());
+            
+            child.setParent(leftNode.getPos());
+            updateNode(child);
             
             int k = leftNode.getNodeSize() + 1;
             for(int j = 0; j < node.getNodeSize(); j++){
                 leftNode.setKey(k, node.getKey(j));
-                leftNode.setChild(k + 1, node.getChild(j + 1));
+                
+                child = getNode(node.getChild(j + 1));
+                leftNode.setChild(k + 1, child.getPos());
+                
+                child.setParent(leftNode.getPos());
+                updateNode(child);
                 k++;
             }
             leftNode.setNodeSize(maxKeys);
@@ -629,14 +632,24 @@ public class BPTree<K> implements Serializable {
         
         // Merge con vecino derecho
         if(rightNode != null && Objects.equals(rightNode.getParent(), node.getParent()) && rightNode.getNodeSize() == minKeys){
-
-            node.setKey(node.getNodeSize(), parent.getKey(i + 1));
-            node.setChild(node.getNodeSize() + 1, rightNode.getChild(0));
+            Node child;
+            
+            node.setKey(node.getNodeSize(), parent.getKey(i));
+            
+            child = getNode(rightNode.getChild(0));
+            node.setChild(node.getNodeSize() + 1, child.getPos());
+            child.setParent(node.getPos());
+            updateNode(child);
             
             int k = node.getNodeSize() + 1;
             for(int j = 0; j < rightNode.getNodeSize(); j++){
                 node.setKey(k, rightNode.getKey(j));
-                node.setChild(k + 1, rightNode.getChild(j + 1));
+                
+                child = getNode(rightNode.getChild(j + 1));
+                node.setChild(k + 1, child.getPos());
+                child.setParent(node.getPos());
+                updateNode(child);
+                
                 k++;
             }
             node.setNodeSize(maxKeys);
@@ -651,7 +664,7 @@ public class BPTree<K> implements Serializable {
             }
             updateNode(node);
             
-            delNode((K) parent.getKey(i + 1), parent.getPos());
+            delNode((K) parent.getKey(i), parent.getPos());
         }
         
     }
