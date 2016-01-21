@@ -23,8 +23,8 @@ public final class Node<K> implements Serializable {
     
     private Long pos; // Posicion del nodo dentro del archivo.
     private final K[] keys; // Claves
-    private final Long[] children; // hijos
-    private final Long[] values; // Valores
+    private final Long[] children; // hijos (valores en caso que sea hoja)
+    // private final Long[] values; // Valores
     
     private final int keysNumber; // Número máximo de claves
     private final Comparator<K> comparator; // Comparador de claves
@@ -37,10 +37,11 @@ public final class Node<K> implements Serializable {
         this.comparator = comparator;
         this.parent = null;
         if(leaf){
-            this.values = new Long[this.keysNumber + 1];
-            this.children = null;
+            // this.values = new Long[this.keysNumber + 1];
+            // this.children = null;
+            this.children = new Long[this.keysNumber + 1];
         }else {
-            this.values = null;
+            // this.values = null;
             this.children = new Long[this.keysNumber + 2];
         }
     }
@@ -78,11 +79,13 @@ public final class Node<K> implements Serializable {
     }
     
     public Long getValue(int index){
-        return values[index];
+        // return values[index];
+        return children[index];
     }
 
     public void setValue(int index, Long value){
-        values[index] = value;
+        // values[index] = value;
+        children[index] = value;
     }
     
     public K getKey(int index){
@@ -117,11 +120,13 @@ public final class Node<K> implements Serializable {
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];
-            values[i + 1] = values[i];
+            // values[i + 1] = values[i];
+            children[i + 1] = children[i];
             i--;
         }
         keys[i + 1] = key;
-        values[i + 1] = value;
+        // values[i + 1] = value;
+        children[i + 1] = value;
         nodeSize++;
     }
     
@@ -151,7 +156,8 @@ public final class Node<K> implements Serializable {
         for(int j = i + 1; j < getNodeSize(); j++){
             keys[j - 1] = keys[j];
             if(leaf){
-                values[j -1] = values[j];
+                // values[j -1] = values[j];
+                children[j -1] = children[j];
             }else {
                 children[j] = children[j + 1];
             }
@@ -184,7 +190,8 @@ public final class Node<K> implements Serializable {
     public Collection<Long> values() {
         ArrayList<Long> v = new ArrayList<>();
         for(int i = 0; i < nodeSize; i++)
-            v.add(values[i]);
+            // v.add(values[i]);
+            v.add(children[i]);
         return v;
     }
 }
