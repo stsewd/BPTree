@@ -38,7 +38,7 @@ public class Main {
         // Obtener tamaño del objeto serializado
         // (113 en el caso de los objetos de prueba creados).
         // * Si el objeto varía con el tiempo, escoger un tamaño
-        // límite.
+        // límite superior al obtenido.
         /*
         try {
             byte[] b;
@@ -62,18 +62,18 @@ public class Main {
         /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
-            bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 300);
+            bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 300, 1500);
             
             // Agregar tabla de indice secundaria
-            bpTreeMap.addSecIndex(treePathSec, new NombreGenerator());
+            bpTreeMap.addSecIndex(treePathSec, new NombreGenerator(), 1500);
             
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
         
-        /*
         // Agregamos los objetos al arbol
+        /*
         try {
             bpTreeMap.put(p3.lastName, p3);
             bpTreeMap.put(p4.lastName, p4);
@@ -82,14 +82,16 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        */
         
         // Recuperamos
+        /*
         try {
-            System.out.println("De tabla de indice primaria.");
+            System.out.println("De tabla de indice primaria (Ordenados por apellidos).");
             for(Person p : bpTreeMap.values())
                 System.out.println(p);
             
-            System.out.println("De tabla de indice sec.");
+            System.out.println("De tabla de indice sec (Ordenados por nombre).");
             for(Person p : bpTreeMap.valuesOf(0))
                 System.out.println(p);
             
@@ -103,7 +105,6 @@ public class Main {
         *********************************************************************/
         
         // Prueba con claves de tipo String
-        
         /*
         BPTree<String> tree = null;
         
@@ -120,7 +121,7 @@ public class Main {
         };
         
 
-        System.out.println("Orden de insercion: " + String.join(" ", letters));
+        System.out.println("Orden de inserción: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++){
             try {
                 tree.add(letters[i], 0L);
@@ -133,22 +134,14 @@ public class Main {
         
         try {
             tree.showAll();
+            System.out.println();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
         
         // Prueba con claves de tipo entero.
-        
         /*
-        ArrayList<Integer> n = new ArrayList();
-        for(int i = 0; i < 10; i++)
-            n.add(i);
-        Collections.shuffle(n);
-        */
-        
-        int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
-        
         BPTree<Integer> tree = null;
         
         try {
@@ -156,6 +149,32 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        
+        ArrayList<Integer> n = new ArrayList();
+        for(int i = 0; i < 100; i++)
+            n.add(i);
+        Collections.shuffle(n);
+        
+        try{
+            for(int i = 0; i < n.size(); i++){
+                tree.add(n.get(i), 0L);
+            }
+        } catch (Exception ex){
+            System.out.println(ex);
+        }
+        
+        System.out.println(tree);
+
+        try{
+            tree.showAll();
+            System.out.println();
+        } catch(Exception ex){
+            System.out.println(ex);
+        }
+        */
+        
+        /* Solo para debug
+        int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
         
         try {
             tree.add(3, 0L);
@@ -195,57 +214,7 @@ public class Main {
             
         } catch (Exception ex) {
             System.out.println("Error " + ex);
-        }
-        
-        /*
-        //System.out.println(n);
-        System.out.println("5, 3, 8, 0, 2, 6, 7, 9, 4, 1");
-        try {
-            for(int i = 0; i < n.length; i++)
-                tree.add(n[i], 0L);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(8);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(9);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(5);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(2);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(1);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-        } catch (Exception ex) {
-            System.out.println("Error: " + ex);
-        }
-        */
-        
-        /*
-        try{
-            tree.del(3);
-            tree.del(4);
-            System.out.println(tree);
-            tree.showAll();
-        System.out.println();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        } // Fin debug
         */
     }
     

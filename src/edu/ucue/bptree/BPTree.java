@@ -659,8 +659,7 @@ public class BPTree<K> implements Serializable {
     }
     
     /**
-     * 
-     * @return 
+     * @return the root
      */
     public Long getRoot() {
         return root;
@@ -847,6 +846,13 @@ public class BPTree<K> implements Serializable {
         }
     }
     
+    /**
+     * Actualiza un nodo en su posicion original.
+     * @param node
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws ObjectSizeException 
+     */
     private void updateNode(Node node) throws IOException, FileNotFoundException, ObjectSizeException{
         updateNode(node, node.getPos());
     }
