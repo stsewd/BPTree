@@ -1,4 +1,4 @@
-package edu.ucue.main;
+package edu.ucue.example;
 
 import java.io.Serializable;
 import java.util.Comparator;

@@ -1,7 +1,7 @@
 /**
- * B+ Tree / Árbol B+
+ * Ejemplo de uso del árbol B+.
  */
-package edu.ucue.main;
+package edu.ucue.example;
 
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
@@ -193,7 +193,6 @@ public class Main {
             tree.showAll();
             System.out.println();
             
-            // Revisar lista ligada de nodos al mezclar.
         } catch (Exception ex) {
             System.out.println("Error " + ex);
         }

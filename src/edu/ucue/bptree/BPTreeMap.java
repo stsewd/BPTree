@@ -1,3 +1,8 @@
+/**
+ * Capa que permite trabajar con un archivo de valores
+ * e indices (primario y secundarios), implementando
+ * un árbol B+.
+ */
 package edu.ucue.bptree;
 
 import java.io.ByteArrayInputStream;
@@ -23,7 +28,6 @@ public class BPTreeMap<K, V> implements Serializable {
     private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
     private final int KEYS_NUMBER;
-    private static final int NODE_SIZE = 1500; // Tamaño predefinido para cada nodo.
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
     private List<BPTree> secTreeIndex; // Lista de árboles que contienen indices secundarios.
