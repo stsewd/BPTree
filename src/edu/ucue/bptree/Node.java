@@ -14,7 +14,7 @@ import java.util.Comparator;
  * @param <K> Clave
  */
 public final class Node<K> implements Serializable {
-    private boolean leaf; // Hoja
+    private final boolean leaf; // Hoja
     
     private int nodeSize; // Tamaño actual del nodo
     private Long parent; // Posicion dentro del archivo donde esta el padre
@@ -110,10 +110,6 @@ public final class Node<K> implements Serializable {
 
     public boolean isLeaf() {
         return leaf;
-    }
-
-    public void setLeaf(boolean leaf) {
-        this.leaf = leaf;
     }
    
     public void insertValue(K key, Long value){
