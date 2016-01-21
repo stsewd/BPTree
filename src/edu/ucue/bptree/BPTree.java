@@ -501,6 +501,8 @@ public class BPTree<K> implements Serializable {
             
             // Correr 1 posicion las claves/valores
             int k = node.getNodeSize() - 1;
+            if(k == -1)
+                node.setChild(k + 2, node.getChild(k + 1));
             while(k >= 0) {
                 node.setKey(k + 1, node.getKey(k));
                 node.setChild(k + 2, node.getChild(k + 1));
@@ -516,13 +518,14 @@ public class BPTree<K> implements Serializable {
 
             child.setParent(node.getPos());
             updateNode(child);
-
+            
             leftNode.setNodeSize(leftNode.getNodeSize() - 1);  
             updateNode(leftNode);
-
+            
             // Actualizar padre
-            parent.setKey(i - 1, node.getKey(0));
+            parent.setKey(i - 1, leftNode.getKey(leftNode.getNodeSize()));
             updateNode(parent);
+            
             return;
         }
         
@@ -530,37 +533,6 @@ public class BPTree<K> implements Serializable {
         Node rightNode = getNode(node.next());
         if(rightNode != null && Objects.equals(rightNode.getParent(), node.getParent()) && rightNode.getNodeSize() > minKeys){
             int first = 0;
-            /*
-            - Buscar nodo "generador" desde el padre del nodo.
-            - Bajar esa clave a la última + 1 posicion.
-            - Tomar hijo del nodo vecino.
-            - Borrar primer hijo de nodo vecino y primera clave.
-            - Poner nueva clave en nodo generador del padre.
-                ejemplo:
-                      u
-                s t      w x y
-               1 2 3    4 5 6 7
-
-                Borrando t (se fusionan 2 y 3)
-                Caso actual:
-                    u
-                s       w x y
-               1 23    4 5 6 7
-                Balanceando arbol
-                      u 
-                s  u     w x y
-               1 23 4   4 5 6 7
-
-                     u 
-                s  u    x y
-               1 23 4  5 6 7
-
-                      x 
-                s  u    x y
-               1 23 4  5 6 7
-
-                Listo!
-            */
 
             // Insertar nuevo valor
             Node child = getNode(rightNode.getChild(0));
@@ -586,7 +558,7 @@ public class BPTree<K> implements Serializable {
             
             rightNode.setNodeSize(rightNode.getNodeSize() - 1);  
             updateNode(rightNode);
-
+            
             return;
         }
         
@@ -632,11 +604,10 @@ public class BPTree<K> implements Serializable {
         
         // Merge con vecino derecho
         if(rightNode != null && Objects.equals(rightNode.getParent(), node.getParent()) && rightNode.getNodeSize() == minKeys){
-            Node child;
             
+            Node child = getNode(rightNode.getChild(0));
+
             node.setKey(node.getNodeSize(), parent.getKey(i));
-            
-            child = getNode(rightNode.getChild(0));
             node.setChild(node.getNodeSize() + 1, child.getPos());
             child.setParent(node.getPos());
             updateNode(child);
@@ -653,7 +624,6 @@ public class BPTree<K> implements Serializable {
                 k++;
             }
             node.setNodeSize(maxKeys);
-            
             updateNode(node);
             
             node.setNext(rightNode.next());
@@ -666,7 +636,6 @@ public class BPTree<K> implements Serializable {
             
             delNode((K) parent.getKey(i), parent.getPos());
         }
-        
     }
     
     /**

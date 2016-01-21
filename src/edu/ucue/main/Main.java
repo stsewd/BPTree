@@ -174,25 +174,26 @@ public class Main {
             System.out.println(tree);
             tree.showAll();
             System.out.println();
-            tree.del(3);
-            tree.del(4);
-            tree.del(2);
-            tree.del(0);
-            tree.del(1);
             
             tree.del(12);
             tree.del(11);
             tree.del(10);
-            tree.del(5);
-            tree.del(6);
-            tree.del(7);
             tree.del(9);
             tree.del(8);
-            // Revisar mezcla con hijo izq
-            System.out.println("Boorado hasta el 8");
+            tree.del(7);
+            tree.del(6);
+            tree.del(5);
+            tree.del(4);
+            tree.del(3);
+            tree.del(2);
+            tree.del(0);
+            tree.del(1);
+            System.out.println("Arbol");
             System.out.println(tree);
             tree.showAll();
             System.out.println();
+            
+            // Revisar lista ligada de nodos al mezclar.
         } catch (Exception ex) {
             System.out.println("Error " + ex);
         }
