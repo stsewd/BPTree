@@ -55,7 +55,7 @@ public class BPTree<K> implements Serializable {
     
     /**
      * Retorna un árbol desde un archivo, si no existe crea uno nuevo vacío.
-     * @param keysNumber
+     * @param order
      * @param comparator
      * @param path
      * @param nodeSize
@@ -64,15 +64,15 @@ public class BPTree<K> implements Serializable {
      * @throws IOException
      * @throws ObjectSizeException 
      */
-    public static BPTree getTree(int keysNumber, Comparator comparator, String path, int nodeSize)
+    public static BPTree getTree(int order, Comparator comparator, String path, int nodeSize)
             throws FileNotFoundException, IOException, ObjectSizeException
     {
         BPTree tree = null;
         
         File treePath = new File(path);
         if(!treePath.exists()){
-            tree = new BPTree(keysNumber, comparator, path, nodeSize, 8L);
-            tree.saveNode(new Node(true, keysNumber, comparator));
+            tree = new BPTree(order, comparator, path, nodeSize, 8L);
+            tree.saveNode(new Node(true, order - 1, comparator));
             return tree;
         }
         
@@ -82,7 +82,7 @@ public class BPTree<K> implements Serializable {
             raf = new RandomAccessFile(treePath, "rw");
             raf.seek(0);
             Long root = raf.readLong();
-            tree = new BPTree(keysNumber, comparator, path, nodeSize, root);
+            tree = new BPTree(order, comparator, path, nodeSize, root);
         } finally {
             raf.close();
         }
@@ -241,7 +241,6 @@ public class BPTree<K> implements Serializable {
             
             updateNode(leaf);
             updateNode(newLeaf);
-            
             
             Node parent = getNode(leaf.getParent());
             newLeaf.setParent(parent.getPos());

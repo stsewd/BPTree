@@ -27,17 +27,17 @@ public class BPTreeMap<K, V> implements Serializable {
     private final File PATH; // Ruta donde se almacenará la tabla de valores.
     private final int OBJ_SIZE; // Tamaño max reservado para cada objeto.
     private final int EXTRA_BYTES = 4; // Bytes extras que contienen el tamaño del objeto.
-    private final int KEYS_NUMBER;
+    private final int ORDER; // Orden del árbol.
     private BPTree<K> tree; // Árbol B+, tabla de índices.
     
     private List<BPTree> secTreeIndex; // Lista de árboles que contienen indices secundarios.
     private List<IndexGenerator<V, Object>> indexGenerators; // Lista de generadores de indices secundarios.
     
-    private BPTreeMap(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
+    private BPTreeMap(int order, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
             throws IOException, FileNotFoundException, ObjectSizeException
     {
-        KEYS_NUMBER = keysNumber;
-        tree = BPTree.getTree(keysNumber, comparator, treePath, nodeSize);
+        ORDER = order;
+        tree = BPTree.getTree(order, comparator, treePath, nodeSize);
         PATH = new File(dataPath);
         OBJ_SIZE = objSize;
         
@@ -48,7 +48,7 @@ public class BPTreeMap<K, V> implements Serializable {
     /**
      * Recupera un árbol existente de la ruta dada, si no existe
      * se retorna un nuevo árbol con los parámetros establecidos.
-     * @param keysNumber
+     * @param order
      * @param comparator
      * @param dataPath
      * @param treePath
@@ -59,10 +59,10 @@ public class BPTreeMap<K, V> implements Serializable {
      * @throws java.lang.ClassNotFoundException 
      * @throws edu.ucue.bptree.ObjectSizeException 
      */
-    public static BPTreeMap getTree(int keysNumber, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
+    public static BPTreeMap getTree(int order, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
             throws FileNotFoundException, IOException, ClassNotFoundException, ObjectSizeException
     {
-        return new BPTreeMap(keysNumber, comparator, dataPath, treePath, objSize, nodeSize);
+        return new BPTreeMap(order, comparator, dataPath, treePath, objSize, nodeSize);
     }
     
     /**
@@ -78,7 +78,7 @@ public class BPTreeMap<K, V> implements Serializable {
     public void addSecIndex(String treePath, IndexGenerator indexGenerator, int nodeSize)
             throws IOException, FileNotFoundException, ObjectSizeException
     {
-        secTreeIndex.add(BPTree.getTree(KEYS_NUMBER, indexGenerator.getComparator(), treePath, nodeSize));
+        secTreeIndex.add(BPTree.getTree(ORDER, indexGenerator.getComparator(), treePath, nodeSize));
         indexGenerators.add(indexGenerator);
     }
     

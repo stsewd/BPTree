@@ -8,6 +8,7 @@ import edu.ucue.bptree.BPTreeMap;
 import edu.ucue.bptree.IndexGenerator;
 import edu.ucue.bptree.ObjectSizeException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class Main {
         
         // Ruta donde se manejara la tabla de indice secundario.
         String treePathSec = "data/persons_name_index.dat";
+        
+        File dir = new File("data");
+        dir.mkdir();
         
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
         /*
