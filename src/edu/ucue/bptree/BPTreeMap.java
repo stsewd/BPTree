@@ -22,6 +22,8 @@ import java.util.List;
 /**
  *
  * @author Santos Gallegos
+ * @param <K> Clave
+ * @param <V> Valor
  */
 public class BPTreeMap<K, V> implements Serializable {
     private final File PATH; // Ruta donde se almacenará la tabla de valores.
@@ -328,11 +330,11 @@ public class BPTreeMap<K, V> implements Serializable {
             raf.write(rest);
             
             // Eliminar clave secundaria y volver a añadirla con nuevo valor
-            // en caso que se haya modificado valor de clave secundaria.
+            // en caso que se haya modificado el valor de la clave secundaria.
             for(int i = 0; i < secTreeIndex.size(); i++){
                 IndexGenerator ig = indexGenerators.get(i);
                 secTreeIndex.get(i).del(ig.getKey(oldObj));
-                secTreeIndex.get(i).add(ig.getKey(obj), pos);
+                secTreeIndex.get(i).add(ig.getKey(newValue), pos);
             }
         } finally {
             raf.close();

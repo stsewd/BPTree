@@ -3,7 +3,7 @@ package edu.ucue.bptree;
 import java.io.File;
 
 /**
- *
+ * 
  * @author Santos Gallegos
  */
 public class ObjectSizeException extends Exception {

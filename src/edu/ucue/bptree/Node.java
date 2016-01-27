@@ -46,34 +46,58 @@ public final class Node<K> implements Serializable {
         }
     }
 
+    /**
+     * Cambia la posicion del nodo.
+     * @param pos 
+     */
     public void setPos(Long pos) {
         this.pos = pos;
     }
-
+    
+    /**
+     * 
+     * @return posicion del nodo
+     */
     public Long getPos() {
         return pos;
     }
     
     /**
-     * Retorna el siguiente nodo hoja (lista de claves).
-     * @return 
+     * 
+     * @return siguiente nodo hoja/interno.
      */
     public Long next(){
         return next;
     }
     
+    /**
+     * 
+     * @return anterior nodo hoja/interno.
+     */
     public Long prev(){
         return prev;
     }
     
+    /**
+     * Set the next
+     * @param node 
+     */
     public void setNext(Long node){
         this.next = node;
     }
 
+    /**
+     * Set the prev
+     * @param prev 
+     */
     public void setPrev(Long prev) {
         this.prev = prev;
     }
 
+    /**
+     * Cambia el tamaño actual del nodo (número de claves).
+     * @param nodeSize 
+     */
     public void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
     }
@@ -104,6 +128,10 @@ public final class Node<K> implements Serializable {
         children[index] = child;
     }
 
+    /**
+     * 
+     * @return Tamaño actual del nodo (número de claves).
+     */
     public int getNodeSize() {
         return nodeSize;
     }
@@ -111,7 +139,12 @@ public final class Node<K> implements Serializable {
     public boolean isLeaf() {
         return leaf;
     }
-   
+    
+    /**
+     * Inserta una clave con su respectivo valor.
+     * @param key
+     * @param value 
+     */
     public void insertValue(K key, Long value){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
@@ -126,6 +159,11 @@ public final class Node<K> implements Serializable {
         nodeSize++;
     }
     
+    /**
+     * Inserta una clave junto a su hijo (ubicado a la derecha de la clave).
+     * @param key
+     * @param child 
+     */
     public void insertChild(K key, Long child){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
@@ -139,6 +177,12 @@ public final class Node<K> implements Serializable {
         nodeSize++;
     }
     
+    /**
+     * Elimina una clave; si el nodo es hoja, se elimina su valor;
+     * si el nodo no es hoja (interno), se elimina su hijo ubicado
+     * a la derecha del nodo.
+     * @param key 
+     */
     public void remove(K key){
         int i;
         for(i = 0; i < getNodeSize(); i++){
@@ -183,6 +227,10 @@ public final class Node<K> implements Serializable {
         return str;
     }
 
+    /**
+     * Retorna una coleccion con todos los valores del nodo en orden.
+     * @return 
+     */
     public Collection<Long> values() {
         ArrayList<Long> v = new ArrayList<>();
         for(int i = 0; i < nodeSize; i++)
