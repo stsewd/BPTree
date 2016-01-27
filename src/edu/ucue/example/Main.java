@@ -35,7 +35,7 @@ public class Main {
         Person p2 = new Person("0002", "Perez001", 33);
         Person p3 = new Person("0001", "Perez002", 33);
         Person p4 = new Person("0000", "Perez003", 33);
-        
+               
         // Obtener tamaño del objeto serializado
         // (113 en el caso de los objetos de prueba creados).
         // * Si el objeto varía con el tiempo, escoger un tamaño
@@ -61,7 +61,7 @@ public class Main {
         
         File dir = new File("data");
         dir.mkdir();
-        
+               
         // Construir map con el tipo de clave y el tipo de objeto a almacenar.
         /*
         BPTreeMap<String, Person> bpTreeMap = null;
