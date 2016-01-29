@@ -128,7 +128,7 @@ public class Main {
         System.out.println("Orden de inserción: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++){
             try {
-                tree.add(letters[i], 0L);
+                tree.add(letters[i], 0L); // Agregada una posicion cualquiera sólo por prueba.
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
@@ -175,50 +175,6 @@ public class Main {
         } catch(Exception ex){
             System.out.println(ex);
         }
-        */
-        
-        /* Solo para debug
-        int[] n = new int[]{5, 3, 8, 0, 2, 6, 7, 9, 4, 1};
-        
-        try {
-            tree.add(3, 0L);
-            tree.add(5, 0L);
-            tree.add(8, 0L);
-            tree.add(0, 0L);
-            tree.add(2, 0L);
-            tree.add(6, 0L);
-            tree.add(7, 0L);
-            tree.add(9, 0L);
-            tree.add(4, 0L);
-            tree.add(1, 0L);
-            tree.add(10, 0L);
-            tree.add(11, 0L);
-            tree.add(12, 0L);
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-            tree.del(12);
-            tree.del(11);
-            tree.del(10);
-            tree.del(9);
-            tree.del(8);
-            tree.del(7);
-            tree.del(6);
-            tree.del(5);
-            tree.del(4);
-            tree.del(3);
-            tree.del(2);
-            tree.del(0);
-            tree.del(1);
-            System.out.println("Arbol");
-            System.out.println(tree);
-            tree.showAll();
-            System.out.println();
-            
-        } catch (Exception ex) {
-            System.out.println("Error " + ex);
-        } // Fin debug
         */
     }
     

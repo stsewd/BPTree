@@ -6,8 +6,7 @@ import java.util.Comparator;
  * Clase para especificar que valor tomar de indice de un objeto dado,
  * util para especificar claves secundarias del arbol B+.
  * Nota* Usar con cuidado, tener en cuenta que la clave secundaria debe
- * ser única por cada objeto, a fin de evitar inconvenientes. Se recomienda
- * mezclar con clave primaria.
+ * ser única por cada objeto, se recomienda mezclar con clave primaria.
  * @author Santos Gallegos
  * @param <E> Tipo de objeto
  * @param <V> Tipo de dato del objeto que va a ser indexado.

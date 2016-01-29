@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author stsewd
+ * @author Santos Gallegos
  */
 public class Person implements Serializable {
     public String name;    
