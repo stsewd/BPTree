@@ -91,6 +91,9 @@ public class Main {
         // Recuperamos
         /*
         try {
+            System.out.println("Obtenido usuando get");
+            System.out.println(bpTreeMap.get(p2.lastName));
+            
             System.out.println("De tabla de indice primaria (Ordenados por apellidos).");
             for(Person p : bpTreeMap.values())
                 System.out.println(p);
@@ -169,6 +172,7 @@ public class Main {
         System.out.println(tree);
 
         try{
+            System.out.println(tree.search(4));
             tree.showAll();
             System.out.println();
         } catch(Exception ex){
