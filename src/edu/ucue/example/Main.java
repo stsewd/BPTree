@@ -123,7 +123,6 @@ public class Main {
             "H", "G", "M", "L", "I", "J", "K", "P","X",
             "N", "O", "Y", "S", "T", "U", "V"
         };
-        
 
         System.out.println("Orden de inserción: " + String.join(" ", letters));
         for(int i = 0; i < letters.length; i++){

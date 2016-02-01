@@ -35,6 +35,7 @@ public class BPTreeMap<K, V> implements Serializable {
     
     private List<BPTree> secTreeIndex; // Lista de árboles que contienen indices secundarios.
     private List<IndexGenerator<V, Object>> indexGenerators; // Lista de generadores de indices secundarios.
+    
     private BPTreeMap(int order, Comparator comparator, String dataPath, String treePath, int objSize, int nodeSize)
             throws IOException, FileNotFoundException, ObjectSizeException
     {
@@ -151,16 +152,15 @@ public class BPTreeMap<K, V> implements Serializable {
             // Llenar de bytes
             rest = new byte[OBJ_SIZE - obj.length + EXTRA_BYTES];
             ram.write(rest);
+            
+            tree.add(key, pos);
+            // Agregar claves en arboles secundarios.
+            for(int i = 0; i < secTreeIndex.size(); i++){
+                IndexGenerator ig = indexGenerators.get(i);
+                secTreeIndex.get(i).add(ig.getKey(value), pos);
+            }
         } finally {
             ram.close();
-        }
-        
-        tree.add(key, pos);
-        
-        // Agregar claves en arboles secundarios.
-        for(int i = 0; i < secTreeIndex.size(); i++){
-            IndexGenerator ig = indexGenerators.get(i);
-            secTreeIndex.get(i).add(ig.getKey(value), pos);
         }
     }
     
@@ -255,7 +255,7 @@ public class BPTreeMap<K, V> implements Serializable {
     private V getObject(long pos) throws FileNotFoundException, IOException, ClassNotFoundException {
         RandomAccessFile raf = null;
         byte[] objByte;
-        V obj = null;
+        V obj;
         try {
             raf = new RandomAccessFile(PATH, "rw");
             
@@ -263,11 +263,10 @@ public class BPTreeMap<K, V> implements Serializable {
             objByte = new byte[raf.readInt()];
             raf.read(objByte);
             obj = (V) deserialize(objByte);
+            return obj;
         } finally {
             raf.close();
         }
-        
-        return obj;
     }
 
     /**

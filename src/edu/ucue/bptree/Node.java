@@ -24,7 +24,6 @@ public final class Node<K> implements Serializable {
     private Long pos; // Posicion del nodo dentro del archivo.
     private final K[] keys; // Claves
     private final Long[] children; // hijos (valores en caso que sea hoja)
-    // private final Long[] values; // Valores
     
     private final int keysNumber; // Número máximo de claves
     private final Comparator<K> comparator; // Comparador de claves
@@ -140,7 +139,7 @@ public final class Node<K> implements Serializable {
      * @param key
      * @param value 
      */
-    public void insertValue(K key, Long value){
+    public void insertKeyAndValue(K key, Long value){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];
@@ -157,7 +156,7 @@ public final class Node<K> implements Serializable {
      * @param key
      * @param child 
      */
-    public void insertChild(K key, Long child){
+    public void insertKeyAndChild(K key, Long child){
         int i = getNodeSize() - 1;
         while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
             keys[i + 1] = keys[i];
@@ -196,7 +195,7 @@ public final class Node<K> implements Serializable {
         }
         nodeSize--;
     }
-
+    
     /**
      * @return the parent
      */
