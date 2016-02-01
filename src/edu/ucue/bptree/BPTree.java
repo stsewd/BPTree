@@ -191,16 +191,19 @@ public class BPTree<K> implements Serializable {
         
         updateNode(leaf);
         
-        if(leaf.getNodeSize() <= maxKeys)
-            return;
-       
+        if(leaf.getNodeSize() > maxKeys)       
+            splitLeaf(leaf);
+    }
+    
+    private void splitLeaf(Node leaf)
+            throws IOException, ObjectSizeException, FileNotFoundException, ClassNotFoundException
+    {
         Node newLeaf = new Node(true, maxKeys, comparator);
         saveNode(newLeaf);
         
         // Dividir claves/valores del nodo hoja
         int k = 0;
-        int j = 0;
-        for(j = minKeys; j < maxKeys + 1; j++){
+        for(int j = minKeys; j < maxKeys + 1; j++){
             newLeaf.setKey(k, leaf.getKey(j));
             newLeaf.setValue(k, leaf.getValue(j));
             k++;
@@ -212,11 +215,13 @@ public class BPTree<K> implements Serializable {
         updateNode(leaf);
         updateNode(newLeaf);
         
+        linkNodes(leaf, newLeaf);
         // Si el padre del nodo es nulo, la hoja es root
         if(leaf.getParent() == null){
             newRootWithTwoChildren(leaf, newLeaf);
         }else {
-            insertNewLeafInParent(newLeaf, leaf);
+            Node parent = getNode(leaf.getParent());
+            insertNewLeafInParent(newLeaf, parent);
         }
     }
     
@@ -247,8 +252,6 @@ public class BPTree<K> implements Serializable {
         saveNode(newRoot);
         setRoot(newRoot.getPos());
 
-        linkNodes(leftNode, rightNode);
-
         leftNode.setParent(newRoot.getPos());
         rightNode.setParent(newRoot.getPos());
 
@@ -261,12 +264,9 @@ public class BPTree<K> implements Serializable {
         updateNode(newRoot);
     }
     
-    private void insertNewLeafInParent(Node newLeaf, Node leaf)
+    private void insertNewLeafInParent(Node newLeaf, Node parent)
             throws IOException, FileNotFoundException, ObjectSizeException, ClassNotFoundException
     {
-        linkNodes(leaf, newLeaf);
-        
-        Node parent = getNode(leaf.getParent());
         newLeaf.setParent(parent.getPos());
 
         updateNode(newLeaf);
@@ -276,7 +276,7 @@ public class BPTree<K> implements Serializable {
         updateNode(parent);
 
         if(parent.getNodeSize() > maxKeys)
-            split(parent.getPos());
+            splitInnerNode(parent.getPos());
     }
     
     /**
@@ -284,7 +284,7 @@ public class BPTree<K> implements Serializable {
      * los nodos tengan el numero de claves adecuado.
      * @param node 
      */
-    private void split(Long nodePos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
+    private void splitInnerNode(Long nodePos) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
         Node node = getNode(nodePos);
         
         Node newNode = new Node(false, maxKeys, comparator);
@@ -361,7 +361,7 @@ public class BPTree<K> implements Serializable {
             updateNode(parent);
             
             if(parent.getNodeSize() > maxKeys)
-                split(parent.getPos());
+                splitInnerNode(parent.getPos());
         }
     }
     
