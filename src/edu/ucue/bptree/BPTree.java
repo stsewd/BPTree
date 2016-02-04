@@ -375,7 +375,7 @@ public class BPTree<K> implements Serializable {
         updateNode(node);
         updateNode(newNode);
         
-        // Si el nodo es raiz
+        // Si el nodo no tiene padre, es raiz
         if(node.getParent() == null){
             Node newRoot = new Node(false, maxKeys, keysComparator);
             
@@ -544,7 +544,6 @@ public class BPTree<K> implements Serializable {
         // Buscar posicion de hijo en padre.
         int i = searchInParent(node);
         
-        // Eliminar clave.
         node.remove(key);
         
         updateNode(node);
@@ -559,7 +558,6 @@ public class BPTree<K> implements Serializable {
             return;
         }
         
-        // Si es raiz o cumple con el minimo de valores. Salir.
         if(node.getNodeSize() >= minKeys || equalsNodesPos(node.getPos(), root))
             return;
 
