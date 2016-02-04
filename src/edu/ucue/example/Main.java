@@ -5,14 +5,12 @@ package edu.ucue.example;
 
 import edu.ucue.bptree.BPTree;
 import edu.ucue.bptree.BPTreeMap;
-import edu.ucue.bptree.IndexGenerator;
-import edu.ucue.bptree.ObjectSizeException;
-import java.io.ByteArrayOutputStream;
+import edu.ucue.bptree.Tools;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -24,6 +22,18 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
+        // Ruta donde se manejará la tabla de valores.
+        String dataPath = "data/persons.dat";
+        
+        // Ruta donde se manejara tabla de índices.
+        String treePath = "data/persons_lastname_index.dat";
+        
+        // Ruta donde se manejara la tabla de indice secundario.
+        String treePathSec = "data/persons_name_index.dat";
+        
+        File dir = new File("data");
+        dir.mkdir();
         
         /********************************************************************
          * Uso del árbol B+ con archivos (tabla de índices primaria/secundaria
@@ -43,54 +53,30 @@ public class Main {
         /*
         try {
             byte[] b;
-            b = serialize(p1);
+            b = Tools.serialize(p1);
             System.out.println(b.length);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
-        
-        // Ruta donde se manejará la tabla de valores.
-        String dataPath = "data/persons.dat";
-        
-        // Ruta donde se manejara tabla de índices.
-        String treePath = "data/persons_lastname_index.dat";
-        
-        // Ruta donde se manejara la tabla de indice secundario.
-        String treePathSec = "data/persons_name_index.dat";
-        
-        File dir = new File("data");
-        dir.mkdir();
                
-        // Construir map con el tipo de clave y el tipo de objeto a almacenar.
+        // Declarar arbol con el tipo de clave y el tipo de objeto a almacenar.
         /*
         BPTreeMap<String, Person> bpTreeMap = null;
         try {
+            // Crear arbol
             bpTreeMap = BPTreeMap.getTree(3, new ComparatorString(), dataPath, treePath, 300, 1500);
             
             // Agregar tabla de indice secundaria
             bpTreeMap.addSecIndex(treePathSec, new NombreGenerator(), 1500);
             
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        */
-        
-        // Agregamos los objetos al arbol
-        /*
-        try {
+            // Agregamos objetos al arbol
             bpTreeMap.put(p3.lastName, p3);
             bpTreeMap.put(p4.lastName, p4);
             bpTreeMap.put(p1.lastName, p1);
             bpTreeMap.put(p2.lastName, p2);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        */
-        
-        // Recuperamos
-        /*
-        try {
+
+            // Recuperamos
             System.out.println("Obtenido usuando get");
             System.out.println(bpTreeMap.get(p2.lastName));
             
@@ -107,84 +93,66 @@ public class Main {
         }
         */
         
+        
         /*********************************************************************
          *  Uso de árbol B+ solo con archivo de indice.
         *********************************************************************/
         
         // Prueba con claves de tipo String
         /*
+        List<String> letters = Arrays.asList(new String[]{
+            "a", "b", "c", "d", "e", "f", "g", "h", "i",
+            "j", "k", "l", "m", "n", "o", "p", "q", "r",
+            "s", "t", "u", "v", "w", "x", "y", "z"
+        });
+        Collections.shuffle(letters);
+        
         BPTree<String> tree = null;
         
         try {
             tree = BPTree.getTree(3, new ComparatorString(), treePath, 1500);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-         
-        String[] letters = {
-            "Z", "W", "R", "A", "C", "B", "D", "E", "F",
-            "H", "G", "M", "L", "I", "J", "K", "P","X",
-            "N", "O", "Y", "S", "T", "U", "V"
-        };
-
-        System.out.println("Orden de inserción: " + String.join(" ", letters));
-        for(int i = 0; i < letters.length; i++){
-            try {
-                tree.add(letters[i], 0L); // Agregada una posicion cualquiera sólo por prueba.
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-        
-        System.out.println(tree);
-        
-        try {
+            
+            System.out.println("Orden de inserción: " + String.join(" ", letters));
+            for(int i = 0; i < letters.size(); i++)
+                tree.add(letters.get(i), 0L);
+            
+            System.out.println(tree);
+            
             tree.showAll();
             System.out.println();
+        
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         */
         
+        
         // Prueba con claves de tipo entero.
         /*
-        BPTree<Integer> tree = null;
-        
-        try {
-            tree = BPTree.getTree(3, new ComparatorInt(), treePath, 1500);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        
         ArrayList<Integer> n = new ArrayList();
         for(int i = 0; i < 100; i++)
             n.add(i);
         Collections.shuffle(n);
         
-        try{
-            for(int i = 0; i < n.size(); i++){
-                tree.add(n.get(i), 0L);
-            }
-        } catch (Exception ex){
-            System.out.println(ex);
-        }
+        BPTree<Integer> tree2 = null;
         
-        System.out.println(tree);
-
-        try{
-            System.out.println(tree.search(4));
-            tree.showAll();
+        try {
+            tree2 = BPTree.getTree(3, new ComparatorInt(), treePath, 1500);
+            
+            System.out.print("Orden de inserccion: ");
+            for (Integer i : n){
+                System.out.println(i + " ");
+                tree2.add(i, 0L);
+            }
             System.out.println();
-        } catch(Exception ex){
-            System.out.println(ex);
+            System.out.println(tree2);
+
+            tree2.showAll();
+            System.out.println();
+            
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
         */
-    }
-    
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
     }
 }
