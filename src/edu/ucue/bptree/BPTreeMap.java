@@ -5,13 +5,9 @@
  */
 package edu.ucue.bptree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -139,7 +135,7 @@ public class BPTreeMap<K, V> implements Serializable {
         try {
             ram = new RandomAccessFile(PATH, "rw");
             
-            obj = serialize(value);
+            obj = Tools.serialize(value);
             
             if(obj.length > OBJ_SIZE)
                 throw new ObjectSizeException(PATH);
@@ -174,9 +170,8 @@ public class BPTreeMap<K, V> implements Serializable {
      */
     public Collection<V> values() throws IOException, FileNotFoundException, ClassNotFoundException {
         ArrayList values = new ArrayList();
-        for(Long pos : tree.values()){
+        for(Long pos : tree.values())
             values.add(getObject(pos));
-        }
         return values;
     }
     
@@ -192,9 +187,8 @@ public class BPTreeMap<K, V> implements Serializable {
     public Collection<V> valuesOf(int indexSecTree) throws IOException, FileNotFoundException, ClassNotFoundException {
         ArrayList values = new ArrayList();
         BPTree<Object> t = secTreeIndex.get(indexSecTree);
-        for(Long pos : t.values()){
+        for(Long pos : t.values())
             values.add(getObject(pos));
-        }
         return values;
     }
 
@@ -239,6 +233,7 @@ public class BPTreeMap<K, V> implements Serializable {
     public void remove(K key) throws IOException, FileNotFoundException, ClassNotFoundException, ObjectSizeException {
         V obj = getObject(tree.search(key));
         tree.del(key);
+        
         // Borrar claves en arboles secundarios.
         for(int i = 0; i < secTreeIndex.size(); i++){
             IndexGenerator ig = indexGenerators.get(i);
@@ -262,37 +257,11 @@ public class BPTreeMap<K, V> implements Serializable {
             raf.seek(pos);
             objByte = new byte[raf.readInt()];
             raf.read(objByte);
-            obj = (V) deserialize(objByte);
+            obj = (V) Tools.deserialize(objByte);
             return obj;
         } finally {
             raf.close();
         }
-    }
-
-    /**
-     * Retorna una cadena de bytes que representan la serializacion del objeto.
-     * @param obj
-     * @return
-     * @throws IOException 
-     */
-    private byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
-    }
-    
-    /**
-     * Dada una cadena de bytes, retorna el objeto que representa.
-     * @param data
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     */
-    private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
     }
     
     /**
@@ -314,7 +283,7 @@ public class BPTreeMap<K, V> implements Serializable {
         try {
             raf = new RandomAccessFile(PATH, "rw");
             
-            obj = serialize(newValue);
+            obj = Tools.serialize(newValue);
             
             if(obj.length > OBJ_SIZE)
                 throw new ObjectSizeException(PATH);
@@ -332,8 +301,11 @@ public class BPTreeMap<K, V> implements Serializable {
             // en caso que se haya modificado el valor de la clave secundaria.
             for(int i = 0; i < secTreeIndex.size(); i++){
                 IndexGenerator ig = indexGenerators.get(i);
-                secTreeIndex.get(i).del(ig.getKey(oldObj));
-                secTreeIndex.get(i).add(ig.getKey(newValue), pos);
+                Comparator comp = ig.getComparator();
+                if(comp.compare(ig.getKey(obj), ig.getKey(oldObj)) != 0){
+                    secTreeIndex.get(i).del(ig.getKey(oldObj));
+                    secTreeIndex.get(i).add(ig.getKey(newValue), pos);
+                }
             }
         } finally {
             raf.close();

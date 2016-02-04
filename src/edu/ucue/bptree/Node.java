@@ -16,29 +16,32 @@ import java.util.Comparator;
 public final class Node<K> implements Serializable {
     private final boolean leaf; // Hoja
     
-    private int nodeSize; // Tamaño actual del nodo
-    private Long parent; // Posicion dentro del archivo donde esta el padre
+    private int nodeSize;
+    private Long parent;
     private Long next; 
     private Long prev;
     
     private Long pos; // Posicion del nodo dentro del archivo.
-    private final K[] keys; // Claves
+    private final K[] keys;
     private final Long[] children; // hijos (valores en caso que sea hoja)
     
-    private final int keysNumber; // Número máximo de claves
-    private final Comparator<K> comparator; // Comparador de claves
+    private final int maxKeys;
+    private final Comparator<K> keysComparator;
 
     public Node(boolean leaf, int keysNumber, Comparator<K> comparator) {
         this.leaf = leaf;
         this.nodeSize = 0;
-        this.keysNumber = keysNumber;
-        this.keys = (K[]) new Object[this.keysNumber + 1];
-        this.comparator = comparator;
+        this.maxKeys = keysNumber;
+        this.keys = (K[]) new Object[this.maxKeys + 1];
+        this.keysComparator = comparator;
         this.parent = null;
+        
+        // Si el nodo es hoja se necesitan maxKeys, +1 para realzar la insercion.
+        // Si el nodo es interno se necesitan maxKeys + 1, +1 para realizar la insercion.
         if(leaf){
-            this.children = new Long[this.keysNumber + 1];
+            this.children = new Long[this.maxKeys + 1];
         }else {
-            this.children = new Long[this.keysNumber + 2];
+            this.children = new Long[this.maxKeys + 2];
         }
     }
 
@@ -141,7 +144,7 @@ public final class Node<K> implements Serializable {
      */
     public void insertKeyAndValue(K key, Long value){
         int i = getNodeSize() - 1;
-        while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
+        while(i >= 0 && lessThan(key, getKey(i))){
             keys[i + 1] = keys[i];
             children[i + 1] = children[i];
             i--;
@@ -158,7 +161,7 @@ public final class Node<K> implements Serializable {
      */
     public void insertKeyAndChild(K key, Long child){
         int i = getNodeSize() - 1;
-        while(i >= 0 && comparator.compare(key, getKey(i)) < 0){
+        while(i >= 0 && lessThan(key, getKey(i))){
             keys[i + 1] = keys[i];
             children[i + 2] = children[i + 1];
             children[i + 1] = children[i];
@@ -178,7 +181,7 @@ public final class Node<K> implements Serializable {
     public void remove(K key){
         int i;
         for(i = 0; i < getNodeSize(); i++){
-            if(comparator.compare(keys[i], key) == 0)
+            if(equalsKeys(keys[i], key))
                 break;
         }
         
@@ -194,6 +197,14 @@ public final class Node<K> implements Serializable {
             }
         }
         nodeSize--;
+    }
+    
+    private boolean lessThan(K k1, K k2){
+        return keysComparator.compare(k1, k2) < 0;
+    }
+        
+    private boolean equalsKeys(K k1, K k2){
+        return keysComparator.compare(k1, k2) == 0;
     }
     
     /**
